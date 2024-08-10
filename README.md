@@ -14,6 +14,10 @@
 - Expense Tracker: Manage your finances.
 
 ## Installation:
+### Option 1: Join the Testflight
+1. https://testflight.apple.com/join/n7y77Avj
+
+### Option 2: Build and install from the source
 1. Clone the repo:
    git clone https://github.com/StikTools/StikTools.git
 
