@@ -8,8 +8,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: 'macos-13'
-            version: '15.2'
+          - os: 'macos-15'
+            version: '16.0'
 
     runs-on: ${{ matrix.os }}
     steps:
