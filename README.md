@@ -13,6 +13,9 @@
 - College Planner: Organize your academic schedule.
 - Expense Tracker: Manage your finances.
 
+## Join the Discord:
+https://discord.gg/qwcxgjg7rc
+
 ## Installation:
 ### Option 1: Join the Testflight
 1. https://testflight.apple.com/join/n7y77Avj
