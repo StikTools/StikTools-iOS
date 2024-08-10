@@ -157,15 +157,15 @@ test:
 ## -- Building --
 
 build:
-	@xcodebuild -project Stossycord.xcodeproj \
-				-scheme Stossycord \
+	@xcodebuild -project StikTools.xcodeproj \
+				-scheme StikTools \
 				-sdk iphoneos \
 				archive -archivePath ./archive \
 				CODE_SIGNING_REQUIRED=NO \
 				AD_HOC_CODE_SIGNING_ALLOWED=YES \
 				CODE_SIGNING_ALLOWED=NO \
-				DEVELOPMENT_TEAM=XYZ0123456 \
-				ORG_IDENTIFIER=com.SideStore \
+				DEVELOPMENT_TEAM=SZ977XLF24 \
+				ORG_IDENTIFIER=com.stik \
 				DWARF_DSYM_FOLDER_PATH="."
 
 ipa:
