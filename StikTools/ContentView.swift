@@ -198,7 +198,7 @@ struct SettingsView: View {
                 HStack {
                     Text("Version")
                     Spacer()
-                    Text("0.6.0")
+                    Text("1.0.0")
                 }
                 HStack {
                     Text("Developed by")
