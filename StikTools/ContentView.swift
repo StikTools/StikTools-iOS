@@ -1722,35 +1722,18 @@ struct UnitConverterView: View {
     
     var body: some View {
         VStack {
-            HStack {
-                Button(action: {
-                    selectedCategoryIndex = (selectedCategoryIndex - 1 + categories.count) % categories.count
-                    resetUnitIndexes()
-                }) {
-                    Image(systemName: "arrow.left.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                }
-                
-                Spacer()
-                
-                Text(selectedCategory)
-                    .font(.title)
-                    .bold()
-                
-                Spacer()
-                
-                Button(action: {
-                    selectedCategoryIndex = (selectedCategoryIndex + 1) % categories.count
-                    resetUnitIndexes()
-                }) {
-                    Image(systemName: "arrow.right.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+            Picker("Category", selection: $selectedCategory) {
+                ForEach(categories, id: \.self) { category in
+                    Text(category)
                 }
             }
+            .pickerStyle(SegmentedPickerStyle())
             .padding()
-
+            .onChange(of: selectedCategory) { _ in
+                selectedInputUnit = units[selectedCategory]?.first ?? ""
+                selectedOutputUnit = units[selectedCategory]?.last ?? ""
+            }
+            
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
                 .padding()
@@ -1878,7 +1861,6 @@ struct UnitConverterView_Previews: PreviewProvider {
         UnitConverterView()
     }
 }
-
 
 #Preview {
     HomeView()
