@@ -26,6 +26,7 @@ struct HomeView: View {
         AppTool(imageName: "pencil.circle.fill", title: "Whiteboard", color: Color.blue.opacity(0.2), destination: AnyView(DrawingView())),
         AppTool(imageName: "calendar", title: "College Planner", color: Color.indigo.opacity(0.2), destination: AnyView(PlannerView())),
         AppTool(imageName: "dollarsign", title: "Expense Tracker", color: Color.purple.opacity(0.2), destination: AnyView(BudgetView())),
+        AppTool(imageName: "arrowshape.right.circle.fill", title: "Unit Converter (WIP)", color: Color.teal.opacity(0.2), destination: AnyView(UnitConverterView())),
     ]
     @State private var searchText: String = ""
     @State private var draggedItem: AppTool?
@@ -1670,6 +1671,119 @@ struct BudgetView: View {
         .accentColor(.purple)
     }
 }
+//
+//  UnitConverterView.swift
+//  StikTools
+//
+//  Created by Tech Guy on 10/8/24.
+//
+
+struct UnitConverterView: View {
+    @State private var inputValue = ""
+    @State private var selectedCategory = "Length"
+    @State private var selectedInputUnit = "Meters"
+    @State private var selectedOutputUnit = "Kilometers"
+    
+    let categories = ["Length", "Weight", "Temperature"]
+    let units = [
+        "Length": ["Meters", "Kilometers", "Feet", "Miles"],
+        "Weight": ["Grams", "Kilograms", "Pounds", "Ounces"],
+        "Temperature": ["Celsius", "Fahrenheit", "Kelvin"]
+    ]
+    
+    var convertedValue: Double {
+        guard let value = Double(inputValue) else { return 0 }
+        
+        switch selectedCategory {
+        case "Length":
+            return convertLength(value: value, from: selectedInputUnit, to: selectedOutputUnit)
+        case "Weight":
+            return convertWeight(value: value, from: selectedInputUnit, to: selectedOutputUnit)
+        case "Temperature":
+            return convertTemperature(value: value, from: selectedInputUnit, to: selectedOutputUnit)
+        default:
+            return 0
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            Picker("Category", selection: $selectedCategory) {
+                ForEach(categories, id: \.self) { category in
+                    Text(category)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .padding()
+            
+            TextField("Enter value", text: $inputValue)
+                .keyboardType(.decimalPad)
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+            
+            Picker("From Unit", selection: $selectedInputUnit) {
+                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
+                    Text(unit)
+                }
+            }
+            .padding()
+            
+            Picker("To Unit", selection: $selectedOutputUnit) {
+                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
+                    Text(unit)
+                }
+            }
+            .padding()
+            
+            Text("Converted Value: \(convertedValue, specifier: "%.2f")")
+                .font(.title)
+                .padding()
+            
+            Spacer()
+        }
+        .padding()
+    }
+    
+  
+    func convertLength(value: Double, from: String, to: String) -> Double {
+        if from == "Meters" && to == "Kilometers" {
+            return value / 1000
+        } else if from == "Kilometers" && to == "Meters" {
+            return value * 1000
+        }
+        
+        return value
+    }
+    
+    func convertWeight(value: Double, from: String, to: String) -> Double {
+        if from == "Grams" && to == "Kilograms" {
+            return value / 1000
+        } else if from == "Kilograms" && to == "Grams" {
+            return value * 1000
+        }
+    
+        return value
+    }
+    
+    func convertTemperature(value: Double, from: String, to: String) -> Double {
+        if from == "Celsius" && to == "Fahrenheit" {
+            return (value * 9/5) + 32
+        } else if from == "Fahrenheit" && to == "Celsius" {
+            return (value - 32) * 5/9
+        }
+
+        return value
+    }
+    // yeah, i still need to add more stuff
+}
+
+struct UnitConverterView_Previews: PreviewProvider {
+    static var previews: some View {
+        UnitConverterView()
+    }
+}
+
 
 #Preview {
     HomeView()
