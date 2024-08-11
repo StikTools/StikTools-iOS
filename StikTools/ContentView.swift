@@ -1682,16 +1682,28 @@ import SwiftUI
 
 struct UnitConverterView: View {
     @State private var inputValue = ""
-    @State private var selectedCategory = "Length"
-    @State private var selectedInputUnit = "Meters"
-    @State private var selectedOutputUnit = "Kilometers"
+    @State private var selectedCategoryIndex = 0
+    @State private var selectedInputUnitIndex = 0
+    @State private var selectedOutputUnitIndex = 1
     
     let categories = ["Length", "Weight", "Temperature"]
     let units = [
-        "Length": ["Meters", "Kilometers", "Feet", "Miles"],
-        "Weight": ["Grams", "Kilograms", "Pounds", "Ounces"],
-        "Temperature": ["Celsius", "Fahrenheit", "Kelvin"]
+        ["Meters", "Kilometers", "Feet", "Miles"],
+        ["Grams", "Kilograms", "Pounds", "Ounces"],
+        ["Celsius", "Fahrenheit", "Kelvin"]
     ]
+    
+    var selectedCategory: String {
+        categories[selectedCategoryIndex]
+    }
+    
+    var selectedInputUnit: String {
+        units[selectedCategoryIndex][selectedInputUnitIndex]
+    }
+    
+    var selectedOutputUnit: String {
+        units[selectedCategoryIndex][selectedOutputUnitIndex]
+    }
     
     var convertedValue: Double {
         guard let value = Double(inputValue) else { return 0 }
@@ -1710,34 +1722,89 @@ struct UnitConverterView: View {
     
     var body: some View {
         VStack {
-            Picker("Category", selection: $selectedCategory) {
-                ForEach(categories, id: \.self) { category in
-                    Text(category)
+            HStack {
+                Button(action: {
+                    selectedCategoryIndex = (selectedCategoryIndex - 1 + categories.count) % categories.count
+                    resetUnitIndexes()
+                }) {
+                    Image(systemName: "arrow.left.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                }
+                
+                Spacer()
+                
+                Text(selectedCategory)
+                    .font(.title)
+                    .bold()
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedCategoryIndex = (selectedCategoryIndex + 1) % categories.count
+                    resetUnitIndexes()
+                }) {
+                    Image(systemName: "arrow.right.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
             .padding()
-            .onChange(of: selectedCategory) { _ in
-                selectedInputUnit = units[selectedCategory]?.first ?? ""
-                selectedOutputUnit = units[selectedCategory]?.last ?? ""
-            }
-            
+
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
             
-            Picker("From Unit", selection: $selectedInputUnit) {
-                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
-                    Text(unit)
+            HStack {
+                Button(action: {
+                    selectedInputUnitIndex = (selectedInputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                
+                Spacer()
+                
+                Text("From: \(selectedInputUnit)")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedInputUnitIndex = (selectedInputUnitIndex + 1) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.right.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
                 }
             }
             .padding()
             
-            Picker("To Unit", selection: $selectedOutputUnit) {
-                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
-                    Text(unit)
+            HStack {
+                Button(action: {
+                    selectedOutputUnitIndex = (selectedOutputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                
+                Spacer()
+                
+                Text("To: \(selectedOutputUnit)")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedOutputUnitIndex = (selectedOutputUnitIndex + 1) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.right.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
                 }
             }
             .padding()
@@ -1749,6 +1816,11 @@ struct UnitConverterView: View {
             Spacer()
         }
         .padding()
+    }
+    
+    func resetUnitIndexes() {
+        selectedInputUnitIndex = 0
+        selectedOutputUnitIndex = 1
     }
     
     func convertLength(value: Double, from: String, to: String) -> Double {
@@ -1806,6 +1878,8 @@ struct UnitConverterView_Previews: PreviewProvider {
         UnitConverterView()
     }
 }
+
+
 
 #Preview {
     HomeView()
