@@ -1678,18 +1678,32 @@ struct BudgetView: View {
 //  Created by Tech Guy on 10/8/24.
 //
 
+import SwiftUI
+
 struct UnitConverterView: View {
     @State private var inputValue = ""
-    @State private var selectedCategory = "Length"
-    @State private var selectedInputUnit = "Meters"
-    @State private var selectedOutputUnit = "Kilometers"
+    @State private var selectedCategoryIndex = 0
+    @State private var selectedInputUnitIndex = 0
+    @State private var selectedOutputUnitIndex = 1
     
     let categories = ["Length", "Weight", "Temperature"]
     let units = [
-        "Length": ["Meters", "Kilometers", "Feet", "Miles"],
-        "Weight": ["Grams", "Kilograms", "Pounds", "Ounces"],
-        "Temperature": ["Celsius", "Fahrenheit", "Kelvin"]
+        ["Meters", "Kilometers", "Feet", "Miles"],
+        ["Grams", "Kilograms", "Pounds", "Ounces"],
+        ["Celsius", "Fahrenheit", "Kelvin"]
     ]
+    
+    var selectedCategory: String {
+        categories[selectedCategoryIndex]
+    }
+    
+    var selectedInputUnit: String {
+        units[selectedCategoryIndex][selectedInputUnitIndex]
+    }
+    
+    var selectedOutputUnit: String {
+        units[selectedCategoryIndex][selectedOutputUnitIndex]
+    }
     
     var convertedValue: Double {
         guard let value = Double(inputValue) else { return 0 }
@@ -1708,30 +1722,89 @@ struct UnitConverterView: View {
     
     var body: some View {
         VStack {
-            Picker("Category", selection: $selectedCategory) {
-                ForEach(categories, id: \.self) { category in
-                    Text(category)
+            HStack {
+                Button(action: {
+                    selectedCategoryIndex = (selectedCategoryIndex - 1 + categories.count) % categories.count
+                    resetUnitIndexes()
+                }) {
+                    Image(systemName: "arrow.left.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                }
+                
+                Spacer()
+                
+                Text(selectedCategory)
+                    .font(.title)
+                    .bold()
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedCategoryIndex = (selectedCategoryIndex + 1) % categories.count
+                    resetUnitIndexes()
+                }) {
+                    Image(systemName: "arrow.right.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
             .padding()
-            
+
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
                 .padding()
                 .background(Color.gray.opacity(0.2))
                 .cornerRadius(8)
             
-            Picker("From Unit", selection: $selectedInputUnit) {
-                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
-                    Text(unit)
+            HStack {
+                Button(action: {
+                    selectedInputUnitIndex = (selectedInputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                
+                Spacer()
+                
+                Text("From: \(selectedInputUnit)")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedInputUnitIndex = (selectedInputUnitIndex + 1) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.right.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
                 }
             }
             .padding()
             
-            Picker("To Unit", selection: $selectedOutputUnit) {
-                ForEach(units[selectedCategory] ?? [], id: \.self) { unit in
-                    Text(unit)
+            HStack {
+                Button(action: {
+                    selectedOutputUnitIndex = (selectedOutputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.left.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
+                }
+                
+                Spacer()
+                
+                Text("To: \(selectedOutputUnit)")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button(action: {
+                    selectedOutputUnitIndex = (selectedOutputUnitIndex + 1) % units[selectedCategoryIndex].count
+                }) {
+                    Image(systemName: "arrow.right.circle")
+                        .resizable()
+                        .frame(width: 30, height: 30)
                 }
             }
             .padding()
@@ -1745,37 +1818,59 @@ struct UnitConverterView: View {
         .padding()
     }
     
-  
+    func resetUnitIndexes() {
+        selectedInputUnitIndex = 0
+        selectedOutputUnitIndex = 1
+    }
+    
     func convertLength(value: Double, from: String, to: String) -> Double {
-        if from == "Meters" && to == "Kilometers" {
-            return value / 1000
-        } else if from == "Kilometers" && to == "Meters" {
-            return value * 1000
+        let conversionTable: [String: Double] = [
+            "Meters": 1.0,
+            "Kilometers": 1000.0,
+            "Feet": 0.3048,
+            "Miles": 1609.34
+        ]
+        
+        if let fromValue = conversionTable[from], let toValue = conversionTable[to] {
+            return value * fromValue / toValue
         }
         
         return value
     }
     
     func convertWeight(value: Double, from: String, to: String) -> Double {
-        if from == "Grams" && to == "Kilograms" {
-            return value / 1000
-        } else if from == "Kilograms" && to == "Grams" {
-            return value * 1000
+        let conversionTable: [String: Double] = [
+            "Grams": 1.0,
+            "Kilograms": 1000.0,
+            "Pounds": 453.592,
+            "Ounces": 28.3495
+        ]
+        
+        if let fromValue = conversionTable[from], let toValue = conversionTable[to] {
+            return value * fromValue / toValue
         }
-    
+        
         return value
     }
     
     func convertTemperature(value: Double, from: String, to: String) -> Double {
-        if from == "Celsius" && to == "Fahrenheit" {
+        switch (from, to) {
+        case ("Celsius", "Fahrenheit"):
             return (value * 9/5) + 32
-        } else if from == "Fahrenheit" && to == "Celsius" {
+        case ("Fahrenheit", "Celsius"):
             return (value - 32) * 5/9
+        case ("Celsius", "Kelvin"):
+            return value + 273.15
+        case ("Kelvin", "Celsius"):
+            return value - 273.15
+        case ("Fahrenheit", "Kelvin"):
+            return (value - 32) * 5/9 + 273.15
+        case ("Kelvin", "Fahrenheit"):
+            return (value - 273.15) * 9/5 + 32
+        default:
+            return value
         }
-
-        return value
     }
-    // yeah, i still need to add more stuff
 }
 
 struct UnitConverterView_Previews: PreviewProvider {
