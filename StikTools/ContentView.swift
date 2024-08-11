@@ -1678,6 +1678,8 @@ struct BudgetView: View {
 //  Created by Tech Guy on 10/8/24.
 //
 
+import SwiftUI
+
 struct UnitConverterView: View {
     @State private var inputValue = ""
     @State private var selectedCategory = "Length"
@@ -1715,6 +1717,10 @@ struct UnitConverterView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding()
+            .onChange(of: selectedCategory) { _ in
+                selectedInputUnit = units[selectedCategory]?.first ?? ""
+                selectedOutputUnit = units[selectedCategory]?.last ?? ""
+            }
             
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
@@ -1745,37 +1751,54 @@ struct UnitConverterView: View {
         .padding()
     }
     
-  
     func convertLength(value: Double, from: String, to: String) -> Double {
-        if from == "Meters" && to == "Kilometers" {
-            return value / 1000
-        } else if from == "Kilometers" && to == "Meters" {
-            return value * 1000
+        let conversionTable: [String: Double] = [
+            "Meters": 1.0,
+            "Kilometers": 1000.0,
+            "Feet": 0.3048,
+            "Miles": 1609.34
+        ]
+        
+        if let fromValue = conversionTable[from], let toValue = conversionTable[to] {
+            return value * fromValue / toValue
         }
         
         return value
     }
     
     func convertWeight(value: Double, from: String, to: String) -> Double {
-        if from == "Grams" && to == "Kilograms" {
-            return value / 1000
-        } else if from == "Kilograms" && to == "Grams" {
-            return value * 1000
+        let conversionTable: [String: Double] = [
+            "Grams": 1.0,
+            "Kilograms": 1000.0,
+            "Pounds": 453.592,
+            "Ounces": 28.3495
+        ]
+        
+        if let fromValue = conversionTable[from], let toValue = conversionTable[to] {
+            return value * fromValue / toValue
         }
-    
+        
         return value
     }
     
     func convertTemperature(value: Double, from: String, to: String) -> Double {
-        if from == "Celsius" && to == "Fahrenheit" {
+        switch (from, to) {
+        case ("Celsius", "Fahrenheit"):
             return (value * 9/5) + 32
-        } else if from == "Fahrenheit" && to == "Celsius" {
+        case ("Fahrenheit", "Celsius"):
             return (value - 32) * 5/9
+        case ("Celsius", "Kelvin"):
+            return value + 273.15
+        case ("Kelvin", "Celsius"):
+            return value - 273.15
+        case ("Fahrenheit", "Kelvin"):
+            return (value - 32) * 5/9 + 273.15
+        case ("Kelvin", "Fahrenheit"):
+            return (value - 273.15) * 9/5 + 32
+        default:
+            return value
         }
-
-        return value
     }
-    // yeah, i still need to add more stuff
 }
 
 struct UnitConverterView_Previews: PreviewProvider {
@@ -1783,7 +1806,6 @@ struct UnitConverterView_Previews: PreviewProvider {
         UnitConverterView()
     }
 }
-
 
 #Preview {
     HomeView()
