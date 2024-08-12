@@ -197,17 +197,17 @@ struct SettingsView: View {
             }
             Section(header: Text("About").font(.headline).foregroundColor(.primary)) {
                 HStack {
-                    Text("Version")
+                    Text("Version:")
                     Spacer()
                     Text("1.0.0")
                 }
                 HStack {
-                    Text("Developed by")
+                    Text("Developers:")
                     Spacer()
-                    Text("Stephen")
+                    Text("Stephen & TechGuy")
                 }
                 HStack {
-                    Text("Icons by")
+                    Text("Icons by:")
                     Spacer()
                     Text("Tyler")
                 }
