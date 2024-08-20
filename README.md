@@ -1,6 +1,4 @@
-# StikTools - Legacy has been discontinued. I am now working on StikTools - College. The code will now be archived.
-
-## StikTools - Your All-in-One Utility App
+# StikTools - Your All-in-One Utility App
 
 ## StikTools is a versatile app designed to simplify your daily tasks, offering a range of tools in one easy-to-use interface.
 
