@@ -22,12 +22,12 @@ https://discord.gg/qwcxgjg7rc
 
 ### Option 2: Build and install from the source
 1. Clone the repo:
-   git clone https://github.com/StikTools/StikTools.git
+   https://github.com/StikTools/StikTools-iOS.git
 
-2. Open in Xcode:
+3. Open in Xcode:
    open StikTools.xcodeproj
 
-3. Build and run the app:
+4. Build and run the app:
    Select your target device or simulator in Xcode and press Cmd + R.
 
 ## Contributing:
