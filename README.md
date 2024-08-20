@@ -1,4 +1,4 @@
-# StikTools - Legacy has been discontuned. I am now working on StikTools - College
+# StikTools - Legacy has been discontinued. I am now working on StikTools - College. The code will now be archived.
 
 ## StikTools - Your All-in-One Utility App
 
