@@ -206,101 +206,106 @@ struct HomeView: View {
     @State private var showPrivacyPolicyAlert: Bool = false // State for showing the privacy policy alert
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    let itemSize: CGFloat = 100
-
     var body: some View {
         NavigationView {
-            ZStack {
-                selectedBackgroundColor
-                    .ignoresSafeArea(.all)
+            GeometryReader { geometry in
+                ZStack {
+                    selectedBackgroundColor
+                        .ignoresSafeArea(.all)
 
-                VStack(spacing: 0) {
-                    // Header
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text("Hello, \(username)!")
-                                .font(.largeTitle.bold())
-                                .foregroundColor(.primaryText)
-                            Text("What would you like to do today?")
-                                .font(.headline)
-                                .foregroundColor(.secondaryText)
-                        }
-                        Spacer()
-                        NavigationLink(destination: SettingsView()) {
-                            Image(systemName: "gearshape.fill")
-                                .imageScale(.large)
-                                .foregroundColor(.white)
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.top, 50)
-                    
-                    // News Section
-                    if !newsItems.isEmpty {
-                        VStack(alignment: .leading) {
-                            Text("Latest News")
-                                .font(.headline)
-                                .foregroundColor(.primaryText)
-                                .padding(.horizontal)
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 15) {
-                                    ForEach(newsItems) { item in
-                                        NewsCard(newsItem: item)
-                                    }
-                                }
-                                .padding(.horizontal)
-                            }
-                        }
-                        .padding(.bottom, 10)
-                    }
-                    
-                    // Join Discord Button Styled as an App Tool
-                    FancyCard {
-                        Button(action: {
-                            joinDiscord()
-                        }) {
-                            HStack {
-                                Image(systemName: "person.2.fill")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                Text("Join the Discord")
-                                    .font(.headline)
+                    VStack(spacing: 0) {
+                        // Header
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text("Hello, \(username)!")
+                                    .font(.system(size: geometry.size.width > 600 ? 40 : 30, weight: .bold))
                                     .foregroundColor(.primaryText)
+                                Text("What would you like to do today?")
+                                    .font(.system(size: geometry.size.width > 600 ? 24 : 18))
+                                    .foregroundColor(.secondaryText)
                             }
-                            .padding()
-                            .frame(width: 370, height: 40) // Adjusted width and height
-                        }
-                    }
-                    .padding(.vertical)
-                    
-                    // Tool Grid
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: itemSize), spacing: 16)], spacing: 20) {
-                            ForEach(tools) { tool in
-                                NavigationLink(destination: tool.destination) {
-                                    FancyCard {
-                                        VStack {
-                                            Image(systemName: tool.imageName)
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 40, height: 40)
-                                                .foregroundColor(.white)
-                                                .padding()
-                                            Text(tool.title)
-                                                .font(.captionFont)
-                                                .foregroundColor(.primaryText)
-                                                .multilineTextAlignment(.center)
-                                        }
-                                        .frame(width: itemSize, height: itemSize)
-                                    }
-                                }
+                            Spacer()
+                            NavigationLink(destination: SettingsView()) {
+                                Image(systemName: "gearshape.fill")
+                                    .imageScale(.large)
+                                    .foregroundColor(.white)
+                                    .padding(.trailing, geometry.size.width > 600 ? 20 : 0)
                             }
                         }
                         .padding(.horizontal)
+                        .padding(.top, geometry.safeAreaInsets.top + 10)
+                        
+                        // News Section
+                        if !newsItems.isEmpty {
+                            VStack(alignment: .leading) {
+                                Text("Latest News")
+                                    .font(.headline)
+                                    .foregroundColor(.primaryText)
+                                    .padding(.horizontal)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 15) {
+                                        ForEach(newsItems) { item in
+                                            NewsCard(newsItem: item)
+                                                .frame(width: geometry.size.width * (geometry.size.width > 600 ? 0.4 : 0.8))
+                                        }
+                                    }
+                                    .padding(.horizontal)
+                                }
+                            }
+                            .padding(.bottom, 10)
+                        }
+                        
+                        // Join Discord Button Styled as an App Tool
+                        FancyCard {
+                            Button(action: {
+                                joinDiscord()
+                            }) {
+                                HStack {
+                                    Image(systemName: "person.2.fill")
+                                        .font(.headline)
+                                        .foregroundColor(.white)
+                                    Text("Join the Discord")
+                                        .font(.headline)
+                                        .foregroundColor(.primaryText)
+                                }
+                                .padding()
+                                .frame(width: geometry.size.width * 0.855, height: geometry.size.height * 0.05)
+                            }
+                        }
+                        .padding(.vertical)
+                        
+                        // Tool Grid
+                        ScrollView {
+                            LazyVGrid(columns: [
+                                GridItem(.adaptive(minimum: geometry.size.width * 0.25), spacing: 20)
+                            ], spacing: 30) {
+                                ForEach(tools) { tool in
+                                    NavigationLink(destination: tool.destination) {
+                                        FancyCard {
+                                            VStack {
+                                                Image(systemName: tool.imageName)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: geometry.size.width * 0.15, height: geometry.size.width * 0.15)
+                                                    .foregroundColor(.white)
+                                                    .padding()
+                                                Text(tool.title)
+                                                    .font(.captionFont)
+                                                    .foregroundColor(.primaryText)
+                                                    .multilineTextAlignment(.center)
+                                                    .padding(.bottom, 10) // Added spacing below the AppTool name
+                                            }
+                                            .frame(width: geometry.size.width * 0.2, height: geometry.size.width * 0.2)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        .background(Color.clear)
                     }
-                    .background(Color.clear)
+                    .padding(.bottom)
                 }
-                .padding(.bottom)
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -337,6 +342,7 @@ struct HomeView: View {
             )
         }
     }
+
     
     // Function to open Discord link
     func joinDiscord() {
@@ -396,11 +402,12 @@ struct HomeView: View {
         }
     }
 
-    
     private func loadCustomBackgroundColor() {
         selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
 }
+
+
 
 
 // Example NewsItem model
