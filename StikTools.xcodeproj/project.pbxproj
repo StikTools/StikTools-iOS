@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		681822082C756789005A0CD1 /* localnews.json in Resources */ = {isa = PBXBuildFile; fileRef = 681822072C756789005A0CD1 /* localnews.json */; };
 		68F7981D2C41ED3F00262CD2 /* StikToolsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7981C2C41ED3F00262CD2 /* StikToolsApp.swift */; };
 		68F7981F2C41ED3F00262CD2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7981E2C41ED3F00262CD2 /* ContentView.swift */; };
 		68F798212C41ED4000262CD2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F798202C41ED4000262CD2 /* Assets.xcassets */; };
@@ -47,6 +48,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		681822072C756789005A0CD1 /* localnews.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = localnews.json; sourceTree = "<group>"; };
 		68ECCC532C4F680A00415B1E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		68ECCC552C4F680A00415B1E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		68F798192C41ED3F00262CD2 /* StikTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StikTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -127,6 +129,7 @@
 			children = (
 				68F798462C41F9BD00262CD2 /* Info.plist */,
 				68F7981C2C41ED3F00262CD2 /* StikToolsApp.swift */,
+				681822072C756789005A0CD1 /* localnews.json */,
 				68F7981E2C41ED3F00262CD2 /* ContentView.swift */,
 				68F798202C41ED4000262CD2 /* Assets.xcassets */,
 				68F798222C41ED4000262CD2 /* Preview Content */,
@@ -269,6 +272,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				68F798242C41ED4000262CD2 /* Preview Assets.xcassets in Resources */,
+				681822082C756789005A0CD1 /* localnews.json in Resources */,
 				68F798212C41ED4000262CD2 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -459,7 +463,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"StikTools/Preview Content\"";
-				DEVELOPMENT_TEAM = F4QL9A2T88;
+				DEVELOPMENT_TEAM = SZ977XLF24;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StikTools/Info.plist;
@@ -468,14 +472,14 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stik.StikTools;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;
@@ -495,7 +499,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"StikTools/Preview Content\"";
-				DEVELOPMENT_TEAM = F4QL9A2T88;
+				DEVELOPMENT_TEAM = SZ977XLF24;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StikTools/Info.plist;
@@ -504,14 +508,14 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stik.StikTools;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = NO;

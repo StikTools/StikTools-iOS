@@ -1,0 +1,12 @@
+[
+    {
+        "id": "1f7e6d08-4a7d-4c5e-a4f4-0c96c2281d61",
+        "title": "Simulator News Item 1",
+        "subtitle": "This is a news item displayed when running in the simulator."
+    },
+    {
+        "id": "23bfb109-8a6e-4a98-91e5-3b5a12c9a0fd",
+        "title": "Simulator News Item 2",
+        "subtitle": "Another example of a simulator news item."
+    }
+]

@@ -14,98 +14,424 @@ import CoreImage.CIFilterBuiltins
 import Combine
 import UniformTypeIdentifiers
 
+// Extension to convert Color to Hex String and back
+extension Color {
+    func toHex() -> String? {
+        let components = UIColor(self).cgColor.components
+        let r = Float(components?[0] ?? 0)
+        let g = Float(components?[1] ?? 0)
+        let b = Float(components?[2] ?? 0)
+        let hex = String(format: "%02lX%02lX%02lX", lroundf(r * 255), lroundf(g * 255), lroundf(b * 255))
+        return "#" + hex
+    }
+    
+    init?(hex: String) {
+        let r, g, b: CGFloat
+        let start = hex.index(hex.startIndex, offsetBy: 1)
+        let hexColor = String(hex[start...])
+
+        if hexColor.count == 6, let hexNumber = Int(hexColor, radix: 16) {
+            r = CGFloat((hexNumber & 0xff0000) >> 16) / 255
+            g = CGFloat((hexNumber & 0x00ff00) >> 8) / 255
+            b = CGFloat(hexNumber & 0x0000ff) / 255
+            self.init(red: r, green: g, blue: b)
+            return
+        }
+
+        return nil
+    }
+}
+
+// Define a theme
+extension Color {
+    static let primaryBackground = Color.teal
+    static let cardBackground = Color.white.opacity(0.2)
+    static let primaryText = Color.white
+    static let secondaryText = Color.white.opacity(0.7)
+}
+
+extension Font {
+    static let titleFont = Font.system(size: 24, weight: .bold)
+    static let bodyFont = Font.system(size: 18, weight: .regular)
+    static let captionFont = Font.system(size: 14, weight: .medium)
+}
+
+// Reusable button style
+struct FancyButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding()
+            .foregroundColor(.primaryText)
+            .background(configuration.isPressed ? Color.gray.opacity(0.8) : Color.blue)
+            .cornerRadius(10)
+            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
+            .animation(.easeInOut(duration: 0.1))
+    }
+}
+
+// Reusable card style
+struct FancyCard<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding()
+            .background(Color.cardBackground)
+            .cornerRadius(15)
+            .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 5)
+    }
+}
+
+// SettingsView with custom background color selection
+struct SettingsView: View {
+    @AppStorage("username") private var username = "User"
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080" // default teal color
+
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
+
+    var body: some View {
+        ZStack {
+            // Apply the selected background color
+            selectedBackgroundColor
+                .ignoresSafeArea()
+
+            Form {
+                Section(header: Text("General").font(.headline).foregroundColor(.primaryText)) {
+                    HStack {
+                        Label("", systemImage: "person.fill")
+                            .foregroundColor(.primaryText)
+                        Spacer()
+                        TextField("Username", text: $username)
+                            .foregroundColor(.primaryText)
+                            .padding(10)
+                            .background(Color.cardBackground)
+                            .cornerRadius(10)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(selectedBackgroundColor, lineWidth: 1)
+                            )
+                    }
+                    .listRowBackground(Color.cardBackground)
+                }
+                
+                Section(header: Text("Appearance").font(.headline).foregroundColor(.primaryText)) {
+                    ColorPicker("Background Color", selection: $selectedBackgroundColor)
+                        .onChange(of: selectedBackgroundColor) { newColor in
+                            saveCustomBackgroundColor(newColor)
+                        }
+                        .listRowBackground(Color.cardBackground)
+                        .foregroundColor(.primaryText)
+                }
+
+                Section(header: Text("About").font(.headline).foregroundColor(.primaryText)) {
+                    HStack {
+                        Text("Version:")
+                            .foregroundColor(.secondaryText)
+                        Spacer()
+                        Text("1.1.0")
+                            .foregroundColor(.primaryText)
+                    }
+                    .listRowBackground(Color.cardBackground)
+                    
+                    HStack {
+                        Text("Creator:")
+                            .foregroundColor(.secondaryText)
+                        Spacer()
+                        Text("Stephen")
+                            .foregroundColor(.primaryText)
+                    }
+                    .listRowBackground(Color.cardBackground)
+                    HStack {
+                        Text("Collaborators:")
+                            .foregroundColor(.secondaryText)
+                        Spacer()
+                        Text("TechGuy")
+                            .foregroundColor(.primaryText)
+                    }
+                    .listRowBackground(Color.cardBackground)
+
+                    HStack {
+                        Text("Icons by:")
+                            .foregroundColor(.secondaryText)
+                        Spacer()
+                        Text("Tyler")
+                            .foregroundColor(.primaryText)
+                    }
+                    .listRowBackground(Color.cardBackground)
+                }
+            }
+            .background(selectedBackgroundColor)
+            .scrollContentBackground(.hidden)
+            .navigationBarTitle("Settings")
+            .font(.bodyFont)
+            .accentColor(.accentColor)
+        }
+        .onAppear {
+            loadCustomBackgroundColor()
+        }
+    }
+
+    // Load custom background color from stored hex string
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
+
+    // Save custom background color as hex string
+    private func saveCustomBackgroundColor(_ color: Color) {
+        customBackgroundColorHex = color.toHex() ?? "#008080"
+    }
+}
+
+// Example of HomeView integrating the theme and background color setting
+
 struct HomeView: View {
     @AppStorage("username") private var username = "User"
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
+    @AppStorage("hasAcceptedPrivacyPolicy") private var hasAcceptedPrivacyPolicy: Bool = false
+
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
     @State private var tools: [AppTool] = [
         AppTool(imageName: "number.circle", title: "Random Number Generator", color: Color.red.opacity(0.2), destination: AnyView(RNGView())),
         AppTool(imageName: "qrcode", title: "QRCode", color: Color.orange.opacity(0.2), destination: AnyView(QRCodeGeneratorView())),
         AppTool(imageName: "level", title: "Level Tool", color: Color.yellow.opacity(0.2), destination: AnyView(LevelView())),
-        AppTool(imageName: "flashlight.on.fill", title: "Flashlight", color: Color.yellow.opacity(0.2), destination: AnyView(FlashlightView())),
         AppTool(imageName: "plus.square", title: "Counter", color: Color.green.opacity(0.2), destination: AnyView(ContentView())),
-        AppTool(imageName: "person.badge.key.fill", title: "Password Generator", color: Color.pink.opacity(0.2), destination: AnyView(PasswordGeneratorView())),
-        AppTool(imageName: "pencil.circle.fill", title: "Whiteboard", color: Color.blue.opacity(0.2), destination: AnyView(DrawingView())),
-        AppTool(imageName: "calendar", title: "College Planner", color: Color.indigo.opacity(0.2), destination: AnyView(PlannerView())),
-        AppTool(imageName: "dollarsign", title: "Expense Tracker", color: Color.purple.opacity(0.2), destination: AnyView(BudgetView())),
-        AppTool(imageName: "arrowshape.right.circle.fill", title: "Unit Converter (WIP)", color: Color.teal.opacity(0.2), destination: AnyView(UnitConverterView())),
+        AppTool(imageName: "pencil.circle.fill", title: "Whiteboard", color: Color.blue.opacity(0.2), destination: AnyView(DrawingView()))
     ]
     @State private var searchText: String = ""
-    @State private var draggedItem: AppTool?
-    @State private var draggedItemIndex: Int?
+    @State private var newsItems: [NewsItem] = [] // News items will be loaded here
+    @State private var showPrivacyPolicyAlert: Bool = false // State for showing the privacy policy alert
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    let columns = [
-        GridItem(.adaptive(minimum: 100), spacing: 16)
-    ]
-
-    var filteredTools: [AppTool] {
-        if searchText.isEmpty {
-            return tools
-        } else {
-            return tools.filter { $0.title.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
+    let itemSize: CGFloat = 100
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                SearchBar(searchText: $searchText)
-                    .padding(.horizontal)
-                    .padding(.top)
-                Text("")
-                ScrollView {
-                    Text("")
-                    LazyVGrid(columns: columns, spacing: 20) {
-                        ForEach(filteredTools.indices, id: \.self) { index in
-                            let tool = filteredTools[index]
-                            NavigationLink(destination: tool.destination) {
-                                VStack {
-                                    Image(systemName: tool.imageName)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 40, height: 40)
-                                        .padding()
-                                    Text(tool.title)
-                                        .font(.caption)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.primary)
-                                        .multilineTextAlignment(.center)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.horizontal, 4)
-                                        .padding(.bottom, 8)  // Added spacing under the title
-                                }
-                                .background(tool.color)
-                                .cornerRadius(15)
-                                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-                                .padding(8)
-                                .onDrag {
-                                    self.draggedItem = tool
-                                    self.draggedItemIndex = index
-                                    return NSItemProvider(object: tool.title as NSString)
-                                }
-                                .onDrop(of: [.text], delegate: ToolDropDelegate(item: tool, tools: $tools, draggedItem: $draggedItem, draggedItemIndex: $draggedItemIndex, currentIndex: index))
-                            }
-                            .opacity(draggedItem == tool ? 0.5 : 1.0)
-                            .scaleEffect(draggedItem == tool ? 1.1 : 1.0)
+            ZStack {
+                selectedBackgroundColor
+                    .ignoresSafeArea(.all)
+
+                VStack(spacing: 0) {
+                    // Header
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Hello, \(username)!")
+                                .font(.largeTitle.bold())
+                                .foregroundColor(.primaryText)
+                            Text("What would you like to do today?")
+                                .font(.headline)
+                                .foregroundColor(.secondaryText)
                         }
-                    }
-                    .padding(.horizontal)
-                }
-                .background(Color(UIColor.systemGroupedBackground).edgesIgnoringSafeArea(.all))
-                .navigationBarTitle("Welcome \(username)!")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Spacer()
                         NavigationLink(destination: SettingsView()) {
                             Image(systemName: "gearshape.fill")
                                 .imageScale(.large)
-                                .foregroundColor(.accentColor)
+                                .foregroundColor(.white)
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.top, 50)
+                    
+                    // News Section
+                    if !newsItems.isEmpty {
+                        VStack(alignment: .leading) {
+                            Text("Latest News")
+                                .font(.headline)
+                                .foregroundColor(.primaryText)
+                                .padding(.horizontal)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 15) {
+                                    ForEach(newsItems) { item in
+                                        NewsCard(newsItem: item)
+                                    }
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.bottom, 10)
+                    }
+                    
+                    // Join Discord Button Styled as an App Tool
+                    FancyCard {
+                        Button(action: {
+                            joinDiscord()
+                        }) {
+                            HStack {
+                                Image(systemName: "person.2.fill")
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                Text("Join the Discord")
+                                    .font(.headline)
+                                    .foregroundColor(.primaryText)
+                            }
+                            .padding()
+                            .frame(width: 370, height: 40) // Adjusted width and height
+                        }
+                    }
+                    .padding(.vertical)
+                    
+                    // Tool Grid
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: itemSize), spacing: 16)], spacing: 20) {
+                            ForEach(tools) { tool in
+                                NavigationLink(destination: tool.destination) {
+                                    FancyCard {
+                                        VStack {
+                                            Image(systemName: tool.imageName)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40, height: 40)
+                                                .foregroundColor(.white)
+                                                .padding()
+                                            Text(tool.title)
+                                                .font(.captionFont)
+                                                .foregroundColor(.primaryText)
+                                                .multilineTextAlignment(.center)
+                                        }
+                                        .frame(width: itemSize, height: itemSize)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .background(Color.clear)
+                }
+                .padding(.bottom)
+            }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+        .onAppear {
+            loadCustomBackgroundColor()
+            #if targetEnvironment(simulator)
+            loadLocalNews() // Load local news for simulator
+            #else
+            loadNews() // Load news from the server on a real device
+            #endif
+            
+            // Show privacy policy alert if not accepted
+            if !hasAcceptedPrivacyPolicy {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showPrivacyPolicyAlert = true
                 }
             }
-            .navigationViewStyle(StackNavigationViewStyle()) // Use StackNavigationViewStyle for iPad
+        }
+        .onReceive(timer) { _ in
+            loadCustomBackgroundColor()
+        }
+        .alert(isPresented: $showPrivacyPolicyAlert) {
+            Alert(
+                title: Text("Privacy Policy"),
+                message: Text("By using this app, you agree to our privacy policy. Please review it carefully."),
+                primaryButton: .default(Text("Read Policy"), action: {
+                    if let url = URL(string: "https://stiktools.xyz/privacy.html") {
+                        UIApplication.shared.open(url)
+                    }
+                }),
+                secondaryButton: .default(Text("Accept"), action: {
+                    hasAcceptedPrivacyPolicy = true
+                })
+            )
         }
     }
+    
+    // Function to open Discord link
+    func joinDiscord() {
+        if let url = URL(string: "https://discord.gg/qwcxgjg7rc") {
+            UIApplication.shared.open(url)
+        }
+    }
+    
+    // Function to load news from JSON
+    func loadNews() {
+        guard let url = URL(string: "https://stiktools.xyz/news.json") else { return }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                do {
+                    let decodedNews = try JSONDecoder().decode([NewsItem].self, from: data)
+                    DispatchQueue.main.async {
+                        newsItems = decodedNews
+                    }
+                } catch {
+                    print("Failed to decode news JSON: \(error)")
+                }
+            }
+        }.resume()
+    }
+
+    // Function to load local news (for simulator)
+    func loadLocalNews() {
+        // Attempt to find the path of the local JSON file
+        if let path = Bundle.main.path(forResource: "localNews", ofType: "json") {
+            do {
+                // Attempt to load the contents of the file into a Data object
+                let data = try Data(contentsOf: URL(fileURLWithPath: path))
+                
+                // Optional: Print the raw JSON data as a string for debugging
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("JSON Data: \(jsonString)")
+                }
+                
+                // Attempt to decode the JSON data into an array of NewsItem objects
+                let decodedNews = try JSONDecoder().decode([NewsItem].self, from: data)
+                
+                // Update the newsItems array with the decoded data
+                newsItems = decodedNews
+            } catch let DecodingError.dataCorrupted(context) {
+                print("Data corrupted: \(context.debugDescription)")
+            } catch let DecodingError.keyNotFound(key, context) {
+                print("Key '\(key)' not found: \(context.debugDescription), codingPath: \(context.codingPath)")
+            } catch let DecodingError.typeMismatch(type, context) {
+                print("Type '\(type)' mismatch: \(context.debugDescription), codingPath: \(context.codingPath)")
+            } catch let DecodingError.valueNotFound(value, context) {
+                print("Value '\(value)' not found: \(context.debugDescription), codingPath: \(context.codingPath)")
+            } catch {
+                print("Failed to load local news JSON: \(error.localizedDescription)")
+            }
+        } else {
+            print("Failed to find the JSON file.")
+        }
+    }
+
+    
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
 }
+
+
+// Example NewsItem model
+struct NewsItem: Identifiable, Decodable {
+    let id: String
+    let title: String
+    let subtitle: String
+}
+
+// Example NewsCard view
+struct NewsCard: View {
+    let newsItem: NewsItem
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(newsItem.title)
+                .font(.headline)
+                .foregroundColor(.primaryText)
+            Text(newsItem.subtitle)
+                .font(.subheadline)
+                .foregroundColor(.secondaryText)
+                .lineLimit(2)
+        }
+        .padding()
+        .background(Color.white.opacity(0.2))
+        .cornerRadius(10)
+        .shadow(radius: 2)
+        .frame(width: 250) // Adjust width as needed
+    }
+}
+
 
 struct AppTool: Identifiable, Equatable {
     var id = UUID()
@@ -119,6 +445,7 @@ struct AppTool: Identifiable, Equatable {
     }
 }
 
+// SearchBar View
 struct SearchBar: View {
     @Binding var searchText: String
 
@@ -150,171 +477,403 @@ struct SearchBar: View {
     }
 }
 
-struct ToolDropDelegate: DropDelegate {
-    let item: AppTool
-    @Binding var tools: [AppTool]
-    @Binding var draggedItem: AppTool?
-    @Binding var draggedItemIndex: Int?
-    let currentIndex: Int
-
-    func performDrop(info: DropInfo) -> Bool {
-        withAnimation {
-            draggedItem = nil
-        }
-        return true
-    }
-
-    func dropEntered(info: DropInfo) {
-        guard let draggedItemIndex = draggedItemIndex else { return }
-        if draggedItemIndex != currentIndex {
-            withAnimation {
-                let fromIndex = draggedItemIndex
-                let toIndex = currentIndex
-                tools.move(fromOffsets: IndexSet(integer: fromIndex), toOffset: toIndex > fromIndex ? toIndex + 1 : toIndex)
-                self.draggedItemIndex = toIndex
-            }
-        }
-    }
-
-    func dropUpdated(info: DropInfo) -> DropProposal? {
-        return DropProposal(operation: .move)
-    }
-}
-
-struct SettingsView: View {
-    @AppStorage("username") private var username = "User"
+// RNGView with uniform styling
+struct RNGView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
+    @State private var randomNumber: Int = 0
+    @State private var isGenerating: Bool = false
+    @State private var minRange: String = "1"
+    @State private var maxRange: String = "100"
+    @State private var errorMessage: String? = nil
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
 
     var body: some View {
-        Form {
-            Section(header: Text("General").font(.headline).foregroundColor(.primary)) {
-                HStack {
-                    Label("Username", systemImage: "person.fill")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    TextField("Username", text: $username)
-                        .multilineTextAlignment(.trailing)
-                }
-            }
-            Section(header: Text("About").font(.headline).foregroundColor(.primary)) {
-                HStack {
-                    Text("Version:")
-                    Spacer()
-                    Text("1.0.0")
-                }
-                HStack {
-                    Text("Developers:")
-                    Spacer()
-                    Text("Stephen & TechGuy")
-                }
-                HStack {
-                    Text("Icons by:")
-                    Spacer()
-                    Text("Tyler")
-                }
-            }
-        }
-        .navigationBarTitle("Settings")
-        .background(Color(UIColor.systemGroupedBackground).edgesIgnoringSafeArea(.all))
-        .font(.body)
-        .accentColor(.accentColor)
-    }
-}
+        ZStack {
+            selectedBackgroundColor
+                .ignoresSafeArea()
 
+            VStack(spacing: 20) {
+                Text("Random Number Generator")
+                    .font(.titleFont)
+                    .foregroundColor(.primaryText)
+                    .padding(.top, 40)
 
-struct FeatureCard: View {
-    let tool: Tool
+                Text("\(randomNumber)")
+                    .font(.system(size: 100, weight: .bold, design: .rounded))
+                    .foregroundColor(.primaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white.opacity(0.3))
+                    .cornerRadius(15)
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
+                    .padding()
 
-    @State private var isHovered = false
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Set Range:")
+                        .font(.headline)
+                        .foregroundColor(.primaryText)
 
-    var body: some View {
-        VStack {
-            Image(systemName: tool.imageName)
-                .foregroundColor(.white)
-                .font(.system(size: 50, weight: .bold))
+                    HStack {
+                        VStack {
+                            Text("Min")
+                                .font(.captionFont)
+                                .foregroundColor(.primaryText)
+                            TextField("Min", text: $minRange)
+                                .keyboardType(.numberPad)
+                                .padding()
+                                .background(Color.cardBackground)
+                                .cornerRadius(15)
+                                .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
+                        }
+
+                        VStack {
+                            Text("Max")
+                                .font(.captionFont)
+                                .foregroundColor(.primaryText)
+                            TextField("Max", text: $maxRange)
+                                .keyboardType(.numberPad)
+                                .padding()
+                                .background(Color.cardBackground)
+                                .cornerRadius(15)
+                                .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+
+                Button(action: {
+                    generateRandomNumber()
+                }) {
+                    Text("Generate Random Number")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primaryText)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(LinearGradient(gradient: Gradient(colors: [Color.pink, Color.orange]), startPoint: .leading, endPoint: .trailing))
+                        .cornerRadius(15)
+                        .shadow(color: .black.opacity(0.3), radius: 5, x: 2, y: 2)
+                        .opacity(isGenerating ? 0.6 : 1.0)
+                        .scaleEffect(isGenerating ? 0.9 : 1.0)
+                        .animation(.spring())
+                }
                 .padding()
-                .background(
-                    LinearGradient(gradient: Gradient(colors: tool.gradientColors), startPoint: .topLeading, endPoint: .bottomTrailing)
-                )
-                .clipShape(Circle())
-                .shadow(color: tool.gradientColors[1].opacity(0.5), radius: 10, x: 0, y: 5)
-                .scaleEffect(isHovered ? 1.1 : 1.0)
-                .animation(.spring(response: 0.4, dampingFraction: 0.6, blendDuration: 0))
+                .disabled(isGenerating)
 
-            Text(tool.title)
-                .foregroundColor(.primary)
-                .font(.headline)
+                if let errorMessage = errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .padding()
+                }
+
+                Spacer()
+            }
+            .padding()
+        }
+        .preferredColorScheme(.light)
+        .onAppear {
+            loadCustomBackgroundColor()
+        }
+    }
+
+    private func generateRandomNumber() {
+        isGenerating = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            if let min = Int(minRange), let max = Int(maxRange), min < max {
+                self.randomNumber = Int.random(in: min...max)
+                self.errorMessage = nil
+            } else {
+                self.errorMessage = "Invalid range. Please enter valid numbers."
+            }
+            self.isGenerating = false
+        }
+    }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
+}
+
+
+
+// QRCodeGeneratorView with uniform styling
+struct QRCodeGeneratorView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
+    @State private var qrCodeText = ""
+    @State private var qrCodeImage: UIImage?
+    @State private var showingAlert = false
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("QR Code Generator")
+                .font(.titleFont)
+                .foregroundColor(.primaryText)
+                .padding(.top, 40)
+            
+            VStack(spacing: 20) {
+                TextField("Enter text for QR code", text: $qrCodeText)
+                    .padding(.horizontal, 20)
+                    .frame(maxWidth: .infinity, maxHeight: 50)
+                    .background(Color.cardBackground)
+                    .cornerRadius(10)
+                
+                Button(action: generateQRCode) {
+                    Text("Generate QR Code")
+                        .font(.bodyFont)
+                        .foregroundColor(.primaryText)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+                .buttonStyle(FancyButtonStyle())
+                
+                Button(action: exportQRCode) {
+                    Text("Export QR Code")
+                        .font(.bodyFont)
+                        .foregroundColor(.primaryText)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                }
+                .buttonStyle(FancyButtonStyle())
+                .alert(isPresented: $showingAlert) {
+                    Alert(
+                        title: Text("QR Code Saved"),
+                        message: Text("QR Code saved to Photos."),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+            }
+            .padding(.horizontal, 20)
+            
+            if let image = qrCodeImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 200, height: 200)
+                    .cornerRadius(10)
+                    .shadow(radius: 10)
+                    .padding()
+            } else {
+                Text("No QR Code available")
+                    .foregroundColor(.secondaryText)
+                    .font(.body)
+                    .padding()
+            }
+            
+            Spacer()
         }
         .padding()
-        .background(VisualEffectBlur(blurStyle: .systemThinMaterial))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.3), radius: 10, x: 0, y: 5)
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white.opacity(0.8), lineWidth: 2)
-        )
-        .padding([.leading, .trailing], 10)
-        .onHover { hovering in
-            isHovered = hovering
+        .background(selectedBackgroundColor.edgesIgnoringSafeArea(.all))
+        .preferredColorScheme(.light)
+        .onAppear {
+            loadCustomBackgroundColor()
         }
+    }
+    
+    private func generateQRCode() {
+        guard let data = qrCodeText.data(using: .utf8) else {
+            qrCodeImage = nil
+            return
+        }
+        
+        let context = CIContext()
+        let filter = CIFilter.qrCodeGenerator()
+        
+        filter.setValue(data, forKey: "inputMessage")
+        
+        let qrCodeSize = CGSize(width: 500, height: 500)
+        
+        guard let ciImage = filter.outputImage else {
+            qrCodeImage = nil
+            return
+        }
+        
+        let scaleX = qrCodeSize.width / ciImage.extent.width
+        let scaleY = qrCodeSize.height / ciImage.extent.height
+        
+        let scaledCIImage = ciImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+        
+        guard let cgImage = context.createCGImage(scaledCIImage, from: scaledCIImage.extent) else {
+            qrCodeImage = nil
+            return
+        }
+        
+        qrCodeImage = UIImage(cgImage: cgImage)
+    }
+    
+    private func exportQRCode() {
+        guard let image = qrCodeImage else { return }
+        
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        
+        showingAlert = true
+    }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
 }
 
-struct Tool: Identifiable, Equatable {
-    let id = UUID()
-    let imageName: String
-    let title: String
-    let gradientColors: [Color]
-    let destination: AnyView
 
-    static func == (lhs: Tool, rhs: Tool) -> Bool {
-        return lhs.id == rhs.id
+// ContentView with uniform styling
+struct ContentView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
+    @AppStorage("counter") private var storedCounter = 0
+    @State private var counter = 0
+    @State private var buttonScale: CGFloat = 1.0
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
+
+    var body: some View {
+        GeometryReader { geometry in
+            VStack(spacing: 40) {
+                Spacer()
+                
+                Text("Counter")
+                    .font(.titleFont)
+                    .foregroundColor(.primaryText)
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
+                    .background(GlassBackground())
+                    .cornerRadius(15)
+                    .shadow(radius: 10)
+                
+                Text("\(counter)")
+                    .font(.system(size: 72, weight: .bold, design: .rounded))
+                    .foregroundStyle(
+                        LinearGradient(gradient: Gradient(colors: [.white, .white]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                    .padding(.horizontal, 30)
+                    .padding(.vertical, 20)
+                    .background(GlassBackground())
+                    .cornerRadius(20)
+                    .shadow(radius: 10)
+                    .animation(.spring(), value: counter)
+                
+                HStack(spacing: 40) {
+                    CounterButton(title: "-", colors: [.red, .orange], action: {
+                        counter -= 1
+                        storedCounter = counter
+                        withAnimation(.easeInOut) {
+                            buttonScale = 0.9
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation(.easeInOut) {
+                                buttonScale = 1.0
+                            }
+                        }
+                    })
+                    .scaleEffect(buttonScale)
+                    
+                    CounterButton(title: "+", colors: [.green, .blue], action: {
+                        counter += 1
+                        storedCounter = counter
+                        withAnimation(.easeInOut) {
+                            buttonScale = 0.9
+                        }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation(.easeInOut) {
+                                buttonScale = 1.0
+                            }
+                        }
+                    })
+                    .scaleEffect(buttonScale)
+                }
+                
+                Spacer()
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .background(
+                selectedBackgroundColor
+                    .edgesIgnoringSafeArea(.all)
+            )
+            .onAppear {
+                counter = storedCounter
+                loadCustomBackgroundColor()
+            }
+        }
+        .preferredColorScheme(.light)
+    }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
+}
+
+
+struct CounterButton: View {
+    var title: String
+    var colors: [Color]
+    var action: () -> Void
+    @State private var buttonScale: CGFloat = 1.0
+
+    var body: some View {
+        Button(action: {
+            impactFeedback()
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0)) {
+                action()
+                buttonScale = 1.2
+            }
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0).delay(0.1)) {
+                buttonScale = 1.0
+            }
+        }) {
+            Text(title)
+                .font(.system(size: 36, weight: .bold, design: .rounded))
+                .frame(width: 80, height: 80)
+                .background(
+                    Circle()
+                        .fill(LinearGradient(gradient: Gradient(colors: colors), startPoint: .topLeading, endPoint: .bottomTrailing))
+                )
+                .foregroundColor(.white)
+                .shadow(radius: 10)
+                .scaleEffect(buttonScale)
+        }
+    }
+
+    private func impactFeedback() {
+        let generator = UIImpactFeedbackGenerator(style: .medium)
+        generator.impactOccurred()
+    }
+}
+
+struct GlassBackground: View {
+    var body: some View {
+        VisualEffectBlur(blurStyle: .systemUltraThinMaterial)
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
     }
 }
 
 struct VisualEffectBlur: UIViewRepresentable {
     var blurStyle: UIBlurEffect.Style
+
     func makeUIView(context: Context) -> UIVisualEffectView {
         return UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
     }
+
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
 }
 
-struct WebView: View {
-    let url: URL
 
-    var body: some View {
-        SafariView(url: url)
-            .edgesIgnoringSafeArea(.all)
-            .navigationBarTitleDisplayMode(.inline)
-    }
-}
-
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        let safariViewController = SFSafariViewController(url: url)
-        return safariViewController
-    }
-
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {
-        // Update the view controller if needed
-    }
-}
-
+// FlashlightView with uniform styling
 struct FlashlightView: View {
     @State private var isFlashlightOn = false
     @State private var buttonScale: CGFloat = 1.0
 
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: isFlashlightOn ? [Color.white, Color.gray] : [Color.black, Color.gray]), startPoint: .top, endPoint: .bottom)
+            Color.primaryBackground
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Text("Flashlight")
-                    .font(.system(size: 40, weight: .bold))
-                    .foregroundColor(isFlashlightOn ? .black : .white)
+                    .font(.titleFont)
+                    .foregroundColor(.primaryText)
                     .padding(.top, 50)
                     .padding(.bottom, 20)
                     .shadow(color: isFlashlightOn ? Color.black.opacity(0.2) : Color.white.opacity(0.2), radius: 10, x: 0, y: 5)
@@ -373,23 +932,25 @@ struct FlashlightView: View {
     }
 }
 
+// LevelView with uniform styling
 struct LevelView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @ObservedObject private var motionManager = MotionManager()
     @State private var isCalibrated = false
     @State private var calibrationOffsetX: Double = 0.0
     @State private var calibrationOffsetY: Double = 0.0
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
     
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [.purple, .orange]), startPoint: .top, endPoint: .bottom)
+            selectedBackgroundColor
                 .ignoresSafeArea()
             
             VStack {
                 Text("Leveling Tool")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+                    .font(.titleFont)
+                    .foregroundColor(.primaryText)
                     .padding()
-                    .foregroundColor(.white)
                 
                 Spacer()
                 
@@ -398,7 +959,7 @@ struct LevelView: View {
                     Text("Y: \(motionManager.y, specifier: "%.2f")")
                     Text("Z: \(motionManager.z, specifier: "%.2f")")
                 }
-                .foregroundColor(.white)
+                .foregroundColor(.primaryText)
                 .padding()
                 
                 LevelIndicator(x: motionManager.x - calibrationOffsetX, y: motionManager.y - calibrationOffsetY)
@@ -413,15 +974,17 @@ struct LevelView: View {
                     Text("Calibrate")
                         .padding()
                         .background(Color.blue)
-                        .foregroundColor(.white)
+                        .foregroundColor(.primaryText)
                         .cornerRadius(10)
                         .shadow(radius: 10)
                 }
                 .padding(.bottom, 50)
             }
         }
+        .preferredColorScheme(.light)
         .onAppear {
             motionManager.startUpdates()
+            loadCustomBackgroundColor()
         }
         .onDisappear {
             motionManager.stopUpdates()
@@ -433,7 +996,12 @@ struct LevelView: View {
         calibrationOffsetY = motionManager.y
         isCalibrated = true
     }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
 }
+
 
 struct LevelIndicator: View {
     var x: Double
@@ -443,7 +1011,7 @@ struct LevelIndicator: View {
         ZStack {
             Circle()
                 .stroke(lineWidth: 4)
-                .foregroundColor(.white)
+                .foregroundColor(.primaryText)
             Circle()
                 .frame(width: 40, height: 40)
                 .foregroundColor(levelColor)
@@ -543,552 +1111,20 @@ class MotionManager: ObservableObject {
         }
     }
 }
-struct QRCodeGeneratorView: View {
-    @State private var qrCodeText = ""
-    @State private var qrCodeImage: UIImage?
-    @State private var showingAlert = false
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("QR Code Generator")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.top, 40)
-            
-            VStack(spacing: 20) {
-                TextField("Enter text for QR code", text: $qrCodeText)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                
-                Button(action: generateQRCode) {
-                    Text("Generate QR Code")
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, maxHeight: 20)
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                }
-                .buttonStyle(FancyButtonStyle())
-                
-                Button(action: exportQRCode) {
-                    Text("Export QR Code")
-                        .padding(.horizontal, 20)
-                        .frame(maxWidth: .infinity, maxHeight: 20)
-                        .background(Color.blue)
-                        .cornerRadius(10)
-                }
-                .buttonStyle(FancyButtonStyle())
-                .alert(isPresented: $showingAlert) {
-                    Alert(
-                        title: Text("QR Code Saved"),
-                        message: Text("QR Code saved to Photos."),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
-            }
-            .padding(.horizontal, 20)
-            
-            if let image = qrCodeImage {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 200, height: 200)
-                    .cornerRadius(10)
-                    .shadow(radius: 10)
-                    .padding()
-            } else {
-                Text("No QR Code available")
-                    .foregroundColor(.gray)
-                    .font(.body)
-                    .padding()
-            }
-            
-            Spacer()
-        }
-        .padding()
-        .onAppear {
-            qrCodeText = ""
-            generateQRCode()
-        }
-    }
-    
-    func generateQRCode() {
-        guard let data = qrCodeText.data(using: .utf8) else {
-            qrCodeImage = nil
-            return
-        }
-        
-        let context = CIContext()
-        let filter = CIFilter.qrCodeGenerator()
-        
-        filter.setValue(data, forKey: "inputMessage")
-        
-        // Adjust image size for higher resolution (e.g., 500x500 points)
-        let qrCodeSize = CGSize(width: 500, height: 500)
-        
-        guard let ciImage = filter.outputImage else {
-            qrCodeImage = nil
-            return
-        }
-        
-        let scaleX = qrCodeSize.width / ciImage.extent.width
-        let scaleY = qrCodeSize.height / ciImage.extent.height
-        
-        let scaledCIImage = ciImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
-        
-        guard let cgImage = context.createCGImage(scaledCIImage, from: scaledCIImage.extent) else {
-            qrCodeImage = nil
-            return
-        }
-        
-        qrCodeImage = UIImage(cgImage: cgImage)
-    }
-    
-    func exportQRCode() {
-        guard let image = qrCodeImage else { return }
-        
-        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        
-        showingAlert = true
-    }
-}
 
-struct FancyButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .padding()
-            .foregroundColor(.white)
-            .background(configuration.isPressed ? Color.gray.opacity(0.8) : Color.blue)
-            .cornerRadius(10)
-            .scaleEffect(configuration.isPressed ? 0.9 : 1.0)
-            .animation(.easeInOut(duration: 0.1))
-    }
-}
-struct RNGView: View {
-    @State private var randomNumber: Int = 0
-    @State private var isGenerating: Bool = false
-    @State private var minRange: String = "1"
-    @State private var maxRange: String = "100"
-    @State private var errorMessage: String? = nil
-
-    var body: some View {
-        ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.purple, Color.blue]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-
-            VStack(spacing: 20) {
-                Text("Random Number Generator")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .padding(.top, 40)
-
-                Text("\(randomNumber)")
-                    .font(.system(size: 100, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white.opacity(0.3))
-                    .cornerRadius(15)
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
-                    .padding()
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Set Range:")
-                        .font(.headline)
-                        .foregroundColor(.white)
-
-                    HStack {
-                        VStack {
-                            Text("Min")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            TextField("Min", text: $minRange)
-                                .keyboardType(.numberPad)
-                                .padding()
-                                .background(Color.white.opacity(0.3))
-                                .cornerRadius(15)
-                                .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
-                        }
-
-                        VStack {
-                            Text("Max")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
-                            TextField("Max", text: $maxRange)
-                                .keyboardType(.numberPad)
-                                .padding()
-                                .background(Color.white.opacity(0.3))
-                                .cornerRadius(15)
-                                .shadow(color: .black.opacity(0.2), radius: 5, x: 2, y: 2)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-
-                Button(action: {
-                    generateRandomNumber()
-                    animateButton()
-                }) {
-                    Text("Generate Random Number")
-                        .font(.title2)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(LinearGradient(gradient: Gradient(colors: [Color.pink, Color.orange]), startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(15)
-                        .shadow(color: .black.opacity(0.3), radius: 5, x: 2, y: 2)
-                        .opacity(isGenerating ? 0.6 : 1.0)
-                        .scaleEffect(isGenerating ? 0.9 : 1.0)
-                        .animation(.spring())
-                }
-                .padding()
-                .disabled(isGenerating)
-
-                if let errorMessage = errorMessage {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                        .padding()
-                }
-
-                Spacer()
-            }
-            .padding()
-        }
-    }
-
-    private func generateRandomNumber() {
-        isGenerating = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            if let min = Int(minRange), let max = Int(maxRange), min < max {
-                self.randomNumber = Int.random(in: min...max)
-                self.errorMessage = nil
-            } else {
-                self.errorMessage = "Invalid range. Please enter valid numbers."
-            }
-            self.isGenerating = false
-        }
-    }
-
-    private func animateButton() {
-        withAnimation {
-            isGenerating.toggle()
-        }
-    }
-}
-
-struct ContentView: View {
-    @AppStorage("counter") private var storedCounter = 0
-    @State private var counter = 0
-    @State private var buttonScale: CGFloat = 1.0
-
-    var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 40) {
-                Spacer()
-                
-                Text("Counter")
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 10)
-                    .background(GlassBackground())
-                    .cornerRadius(15)
-                    .shadow(radius: 10)
-                
-                Text("\(counter)")
-                    .font(.system(size: 72, weight: .bold, design: .rounded))
-                    .foregroundStyle(
-                        LinearGradient(gradient: Gradient(colors: [.white, .white]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                    )
-                    .padding(.horizontal, 30)
-                    .padding(.vertical, 20)
-                    .background(GlassBackground())
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
-                    .animation(.spring(), value: counter)
-                
-                HStack(spacing: 40) {
-                    CounterButton(title: "-", colors: [.red, .orange], action: {
-                        counter -= 1
-                        storedCounter = counter
-                        withAnimation(.easeInOut) {
-                            buttonScale = 0.9
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation(.easeInOut) {
-                                buttonScale = 1.0
-                            }
-                        }
-                    })
-                    .scaleEffect(buttonScale)
-                    
-                    CounterButton(title: "+", colors: [.green, .blue], action: {
-                        counter += 1
-                        storedCounter = counter
-                        withAnimation(.easeInOut) {
-                            buttonScale = 0.9
-                        }
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            withAnimation(.easeInOut) {
-                                buttonScale = 1.0
-                            }
-                        }
-                    })
-                    .scaleEffect(buttonScale)
-                }
-                
-                Spacer()
-            }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-            .background(
-                LinearGradient(gradient: Gradient(colors: [.black, .blue]), startPoint: .top, endPoint: .bottom)
-                    .edgesIgnoringSafeArea(.all)
-            )
-            .onAppear {
-                counter = storedCounter
-            }
-        }
-    }
-}
-
-
-struct GlassBackground: View {
-    var body: some View {
-        VisualEffectBlur2(blurStyle: .systemUltraThinMaterial)
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
-    }
-}
-
-struct CounterButton: View {
-    var title: String
-    var colors: [Color]
-    var action: () -> Void
-    @State private var buttonScale: CGFloat = 1.0
-
-    var body: some View {
-        Button(action: {
-            impactFeedback()
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0)) {
-                action()
-                buttonScale = 1.2
-            }
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.5, blendDuration: 0).delay(0.1)) {
-                buttonScale = 1.0
-            }
-        }) {
-            Text(title)
-                .font(.system(size: 36, weight: .bold, design: .rounded))
-                .frame(width: 80, height: 80)
-                .background(
-                    Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: colors), startPoint: .topLeading, endPoint: .bottomTrailing))
-                )
-                .foregroundColor(.white)
-                .shadow(radius: 10)
-                .scaleEffect(buttonScale)
-        }
-    }
-    
-    private func impactFeedback() {
-        let generator = UIImpactFeedbackGenerator(style: .medium)
-        generator.impactOccurred()
-    }
-}
-
-struct VisualEffectBlur2: UIViewRepresentable {
-    var blurStyle: UIBlurEffect.Style
-
-    func makeUIView(context: Context) -> UIVisualEffectView {
-        return UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
-    }
-
-    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
-}
-struct PasswordGeneratorView: View {
-    @State private var password: String = ""
-    @State private var passwordLength: Double = 12
-    @State private var includeUppercase = true
-    @State private var includeLowercase = true
-    @State private var includeNumbers = true
-    @State private var includeSymbols = true
-    @State private var showAlert = false
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Text("Password Generator")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding(.top, 100)
-                .foregroundColor(Color.white)
-                .shadow(radius: 10)
-
-            Text(password)
-                .font(.system(size: 20, weight: .bold, design: .monospaced))
-                .padding()
-                .frame(maxWidth: .infinity)
-                .foregroundColor(.white)
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(10)
-                .padding(.horizontal)
-                .contextMenu {
-                    Button(action: {
-                        UIPasteboard.general.string = password
-                        showAlert = true
-                    }) {
-                        Text("Copy to Clipboard")
-                        Image(systemName: "doc.on.doc")
-                    }
-                }
-
-            VStack(spacing: 10) {
-                HStack {
-                    Toggle(isOn: $includeUppercase) {
-                        Text("Uppercase")
-                            .foregroundColor(.white)
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                    Toggle(isOn: $includeLowercase) {
-                        Text("Lowercase")
-                            .foregroundColor(.white)
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                }
-                HStack {
-                    Toggle(isOn: $includeNumbers) {
-                        Text("Numbers")
-                            .foregroundColor(.white)
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                    Toggle(isOn: $includeSymbols) {
-                        Text("Symbols")
-                            .foregroundColor(.white)
-                    }
-                    .toggleStyle(SwitchToggleStyle(tint: .blue))
-                }
-            }
-            .padding(.horizontal)
-
-            Slider(value: $passwordLength, in: 8...32, step: 1)
-                .padding(.horizontal)
-                .accentColor(.blue)
-            Text("Password Length: \(Int(passwordLength))")
-                .foregroundColor(.white)
-
-            Button(action: {
-                withAnimation {
-                    password = generatePassword(length: Int(passwordLength))
-                }
-            }) {
-                Text("Generate Password")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    .shadow(radius: 10)
-            }
-
-            Spacer()
-        }
-        .background(LinearGradient(gradient: Gradient(colors: [Color.red, Color.purple]), startPoint: .top, endPoint: .bottom))
-        .edgesIgnoringSafeArea(.all)
-        .alert(isPresented: $showAlert) {
-            Alert(title: Text("Copied"), message: Text("Password copied to clipboard!"), dismissButton: .default(Text("OK")))
-        }
-    }
-
-    func generatePassword(length: Int) -> String {
-        var characterSet = ""
-        if includeUppercase {
-            characterSet += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        }
-        if includeLowercase {
-            characterSet += "abcdefghijklmnopqrstuvwxyz"
-        }
-        if includeNumbers {
-            characterSet += "0123456789"
-        }
-        if includeSymbols {
-            characterSet += "!@#$%^&*()_-+=<>?"
-        }
-        if characterSet.isEmpty {
-            return "Select at least one character set"
-        }
-        return String((0..<length).compactMap { _ in characterSet.randomElement() })
-    }
-}
-
-struct FilePickerView: View {
-    @Binding var selectedFile: String
-    @Environment(\.presentationMode) var presentationMode
-    
-    var body: some View {
-        VStack {
-            Text("Select a text file to load:")
-            
-            Button(action: {
-                loadTextFromFile()
-            }) {
-                Text("Choose File")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.blue)
-                    .cornerRadius(12)
-                    .shadow(radius: 4)
-            }
-            .padding()
-        }
-        .padding()
-    }
-    
-    private func loadTextFromFile() {
-        let documentPicker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.plainText], asCopy: true)
-        documentPicker.delegate = Coordinator(parent: self)
-        UIApplication.shared.windows.first?.rootViewController?.present(documentPicker, animated: true, completion: nil)
-    }
-    
-    class Coordinator: NSObject, UIDocumentPickerDelegate {
-        var parent: FilePickerView
-        
-        init(parent: FilePickerView) {
-            self.parent = parent
-        }
-        
-        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-            guard let selectedFileURL = urls.first else { return }
-            
-            do {
-                let fileContents = try String(contentsOf: selectedFileURL)
-                self.parent.selectedFile = fileContents
-            } catch {
-                print("Error reading contents of selected file: \(error.localizedDescription)")
-            }
-            
-            parent.presentationMode.wrappedValue.dismiss()
-        }
-    }
-}
-
+// DrawingView with uniform styling
 struct DrawingView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @State private var currentPath = Path()
     @State private var paths: [Path] = []
     @State private var color: Color = .black
     @State private var lineWidth: Double = 2
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
     
     var body: some View {
         ZStack {
-            Color(.systemGray6).edgesIgnoringSafeArea(.all)
+            selectedBackgroundColor
+                .edgesIgnoringSafeArea(.all)
             
             VStack {
                 Canvas { context, size in
@@ -1152,8 +1188,17 @@ struct DrawingView: View {
                 }
             }
         }
+        .preferredColorScheme(.light)
+        .onAppear {
+            loadCustomBackgroundColor()
+        }
+    }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
 }
+
 
 struct BlurView: UIViewRepresentable {
     var style: UIBlurEffect.Style
@@ -1168,287 +1213,80 @@ struct BlurView: UIViewRepresentable {
     }
 }
 
-// Define the ClassEvent struct
-struct ClassEvent: Identifiable, Codable, Equatable {
-    var id = UUID()
-    var name: String
-    var startTime: Date
-    var endTime: Date
-    var location: String
-    var description: String
-    var dayOfWeek: String
-}
-
-// Sample data for testing
-let sampleEvents = [
-    ClassEvent(name: "Math 101", startTime: Date(), endTime: Date().addingTimeInterval(3600), location: "Room 101", description: "Algebra and Geometry", dayOfWeek: "Monday"),
-    ClassEvent(name: "English Literature", startTime: Date().addingTimeInterval(7200), endTime: Date().addingTimeInterval(10800), location: "Room 202", description: "Shakespeare and Poetry", dayOfWeek: "Tuesday"),
-    // Add more sample events as needed
-]
-
-// DateFormatter extension for short time format
-extension DateFormatter {
-    static var shortTime: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter
-    }
-}
-
-// Main view for the planner app
-struct PlannerView: View {
-    @AppStorage("eventsData") private var eventsData: Data = Data()
-    @State private var events: [ClassEvent] = []
-    @State private var showingAddEventSheet = false
-
-    var groupedEvents: [String: [ClassEvent]] {
-        Dictionary(grouping: events, by: { $0.dayOfWeek })
-    }
+struct BudgetView: View {
+    @StateObject private var viewModel = BudgetViewModel()
+    @State private var showingAddEntry = false
 
     var body: some View {
         NavigationView {
             ZStack {
-                List {
-                    ForEach(groupedEvents.keys.sorted(), id: \.self) { day in
-                        Section(header: Text(day).font(.title3).fontWeight(.semibold).foregroundColor(.primary)) {
-                            ForEach(groupedEvents[day]!, id: \.id) { event in
-                                NavigationLink(destination: EventDetailView(event: Binding(get: {
-                                    if let index = events.firstIndex(where: { $0.id == event.id }) {
-                                        return events[index]
-                                    }
-                                    return event
-                                }, set: { newValue in
-                                    if let index = events.firstIndex(where: { $0.id == event.id }) {
-                                        events[index] = newValue
-                                    }
-                                }))) {
-                                    EventRowView(event: event)
-                                }
-                            }
-                            .onDelete { indices in
-                                if let index = events.firstIndex(where: { $0.id == groupedEvents[day]![indices.first!].id }) {
-                                    events.remove(at: index)
-                                }
-                            }
-                        }
-                    }
-                }
-                .listStyle(InsetGroupedListStyle())
-                .navigationTitle("College Planner")
-                .background(Color(UIColor.systemGroupedBackground).edgesIgnoringSafeArea(.all))
+                // Set the custom background and ensure it covers the whole screen
+                Color.primaryBackground
+                    .ignoresSafeArea(.all)
                 
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            showingAddEventSheet = true
-                        }) {
-                            Image(systemName: "plus")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
-                                )
-                                .clipShape(Circle())
-                                .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 10)
+                VStack(spacing: 20) {
+                    BudgetOverviewView(viewModel: viewModel)
+                        .padding(.horizontal)
+
+                    List {
+                        ForEach(viewModel.entries) { entry in
+                            HStack {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(entry.category)
+                                        .font(.headline)
+                                        .foregroundColor(.primaryText)
+                                    Text(entry.date, style: .date)
+                                        .font(.subheadline)
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                                Text("$\(entry.amount, specifier: "%.2f")")
+                                    .font(.headline)
+                                    .foregroundColor(entry.isIncome ? .green : .red)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .background(entry.isIncome ? Color.green.opacity(0.2) : Color.red.opacity(0.2))
+                                    .cornerRadius(10)
+                            }
+                            .padding(.vertical, 10)
+                            .padding(.horizontal)
+                            .background(Color(UIColor.systemGray6))
+                            .cornerRadius(15)
+                            .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
                         }
-                        .padding()
-                        .sheet(isPresented: $showingAddEventSheet) {
-                            AddEventView(events: $events)
+                        .onDelete(perform: viewModel.deleteEntry)
+                        .listRowBackground(Color.clear)
+                    }
+                    .listStyle(InsetGroupedListStyle())
+                    .background(Color.clear) // Set the background to clear for custom background visibility
+                    .navigationTitle("Expense Tracker")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            EditButton()
                         }
-                    }
-                }
-            }
-        }
-        .onAppear(perform: loadEvents)
-        .onChange(of: events, perform: { _ in saveEvents() })
-    }
-
-    private func loadEvents() {
-        if let decoded = try? JSONDecoder().decode([ClassEvent].self, from: eventsData) {
-            events = decoded
-        } else {
-            events = sampleEvents
-        }
-    }
-
-    private func saveEvents() {
-        if let encoded = try? JSONEncoder().encode(events) {
-            eventsData = encoded
-        }
-    }
-}
-
-// Detail view for event
-struct EventDetailView: View {
-    @Binding var event: ClassEvent
-
-    var body: some View {
-        ZStack {
-            // Background that adapts to dark and light modes
-            Color(UIColor.systemBackground)
-                .edgesIgnoringSafeArea(.all)
-
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text(event.name)
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .padding(.bottom, 5)
-                        .foregroundColor(.primary) // Adapts to dark mode
-                    
-                    Text(event.dayOfWeek)
-                        .font(.title2)
-                        .foregroundColor(.secondary) // Adapts to dark mode
-                    
-                    HStack {
-                        Image(systemName: "clock")
-                        Text("\(event.startTime, formatter: DateFormatter.shortTime) - \(event.endTime, formatter: DateFormatter.shortTime)")
-                    }
-                    .font(.title2)
-                    .padding(.bottom, 5)
-                    .foregroundColor(.primary) // Adapts to dark mode
-                    
-                    HStack {
-                        Image(systemName: "location")
-                        Text(event.location)
-                    }
-                    .font(.title3)
-                    .foregroundColor(.secondary) // Adapts to dark mode
-                    .padding(.bottom, 20)
-                    
-                    Text(event.description)
-                        .font(.body)
-                        .foregroundColor(.primary) // Adapts to dark mode
-                    
-                    Spacer()
-                }
-                .padding()
-                .background(Color(UIColor.secondarySystemBackground)) // Adapts to dark mode
-                .cornerRadius(20)
-                .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 5)
-                .padding()
-            }
-        }
-        .navigationTitle("Class Details")
-    }
-}
-
-
-// Helper view for displaying each event in the list
-struct EventRowView: View {
-    var event: ClassEvent
-
-    var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(event.name)
-                    .font(.headline)
-                    .foregroundColor(.primary)
-                Text("\(event.startTime, formatter: DateFormatter.shortTime) - \(event.endTime, formatter: DateFormatter.shortTime)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            Spacer()
-            VStack(alignment: .trailing) {
-                Text(event.location)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-            }
-        }
-        .padding()
-        .background(RoundedRectangle(cornerRadius: 15).fill(Color(.systemBackground)).shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5))
-        .padding(.vertical, 5)
-    }
-}
-
-// View for adding a new event
-struct AddEventView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var events: [ClassEvent]
-    @State private var name = ""
-    @State private var startTime = Date()
-    @State private var endTime = Date().addingTimeInterval(3600)
-    @State private var location = ""
-    @State private var description = ""
-    @State private var selectedDayOfWeek = "Monday"
-
-    let daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Class Info").foregroundColor(.primary)) {
-                    TextField("Class Name", text: $name)
-                        .padding(10)
-                        .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(8)
-                        .foregroundColor(.primary)
-
-                    Picker("Day of the Week", selection: $selectedDayOfWeek) {
-                        ForEach(daysOfWeek, id: \.self) {
-                            Text($0)
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button(action: {
+                                showingAddEntry = true
+                            }) {
+                                Image(systemName: "plus.circle.fill")
+                                    .foregroundColor(.accentColor)
+                            }
                         }
                     }
-                    .pickerStyle(SegmentedPickerStyle())
-                    .padding(.vertical, 10)
-
-                    DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
-                        .foregroundColor(.primary)
-
-                    DatePicker("End Time", selection: $endTime, displayedComponents: .hourAndMinute)
-                        .foregroundColor(.primary)
-
-                    TextField("Location", text: $location)
-                        .padding(10)
-                        .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(8)
-                        .foregroundColor(.primary)
-
-                    TextField("Description", text: $description)
-                        .padding(10)
-                        .background(Color(UIColor.secondarySystemBackground))
-                        .cornerRadius(8)
-                        .foregroundColor(.primary)
+                    .sheet(isPresented: $showingAddEntry) {
+                        AddEntryView(viewModel: viewModel)
+                    }
                 }
+                .padding(.bottom, 0) // Ensure the VStack covers the entire height
             }
-            .navigationTitle("Add New Class")
-            .navigationBarItems(leading: Button("Cancel") {
-                presentationMode.wrappedValue.dismiss()
-            }, trailing: Button("Add") {
-                let newEvent = ClassEvent(name: name, startTime: startTime, endTime: endTime, location: location, description: description, dayOfWeek: selectedDayOfWeek)
-                events.append(newEvent)
-                presentationMode.wrappedValue.dismiss()
-            }
-            .disabled(name.isEmpty || location.isEmpty || description.isEmpty))
         }
-        .accentColor(.blue) // Adjust accent color for better contrast in dark mode
+        .navigationViewStyle(StackNavigationViewStyle())
+        .accentColor(.accentColor)
     }
 }
 
-struct PlannerView_Previews: PreviewProvider {
-    static var previews: some View {
-        PlannerView()
-    }
-}
 
-struct EventDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventDetailView(event: .constant(sampleEvents[0]))
-    }
-}
-
-struct EventRowView_Previews: PreviewProvider {
-    static var previews: some View {
-        EventRowView(event: sampleEvents[0])
-            .previewLayout(.sizeThatFits)
-            .padding()
-    }
-}
-
-// Model
+// BudgetEntry Model and ViewModel
 struct BudgetEntry: Identifiable, Codable {
     let id = UUID()
     var date: Date
@@ -1457,7 +1295,6 @@ struct BudgetEntry: Identifiable, Codable {
     var isIncome: Bool
 }
 
-// ViewModel
 class BudgetViewModel: ObservableObject {
     @AppStorage("budgetEntries") private var budgetEntriesData: Data = Data()
     @Published var entries: [BudgetEntry] = []
@@ -1501,7 +1338,7 @@ class BudgetViewModel: ObservableObject {
     }
 }
 
-// Budget Overview View
+// BudgetOverviewView
 struct BudgetOverviewView: View {
     @ObservedObject var viewModel: BudgetViewModel
 
@@ -1564,7 +1401,7 @@ struct BudgetOverviewView: View {
     }
 }
 
-// Add Entry View
+// AddEntryView
 struct AddEntryView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var viewModel: BudgetViewModel
@@ -1607,79 +1444,7 @@ struct AddEntryView: View {
     }
 }
 
-// Main Budget View
-struct BudgetView: View {
-    @StateObject private var viewModel = BudgetViewModel()
-    @State private var showingAddEntry = false
-
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                BudgetOverviewView(viewModel: viewModel)
-                    .padding(.horizontal)
-
-                List {
-                    ForEach(viewModel.entries) { entry in
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(entry.category)
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Text(entry.date, style: .date)
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                            }
-                            Spacer()
-                            Text("$\(entry.amount, specifier: "%.2f")")
-                                .font(.headline)
-                                .foregroundColor(entry.isIncome ? .green : .red)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(entry.isIncome ? Color.green.opacity(0.2) : Color.red.opacity(0.2))
-                                .cornerRadius(10)
-                        }
-                        .padding(.vertical, 10)
-                        .padding(.horizontal)
-                        .background(Color(UIColor.systemGray6))
-                        .cornerRadius(15)
-                        .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 5)
-                    }
-                    .onDelete(perform: viewModel.deleteEntry)
-                    .listRowBackground(Color.clear)
-                }
-                .listStyle(InsetGroupedListStyle())
-                .navigationTitle("Expense Tracker")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        EditButton()
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            showingAddEntry = true
-                        }) {
-                            Image(systemName: "plus.circle.fill")
-                                .foregroundColor(.purple)
-                        }
-                    }
-                }
-                .sheet(isPresented: $showingAddEntry) {
-                    AddEntryView(viewModel: viewModel)
-                }
-            }
-            .background(Color(UIColor.systemGray5).edgesIgnoringSafeArea(.all))
-        }
-        .accentColor(.purple)
-    }
-}
-//
-//  UnitConverterView.swift
-//  StikTools
-//
-//  Created by Tech Guy on 10/8/24.
-//
-
-import SwiftUI
-
+// UnitConverterView with uniform styling
 struct UnitConverterView: View {
     @State private var inputValue = ""
     @State private var selectedCategoryIndex = 0
@@ -1737,6 +1502,7 @@ struct UnitConverterView: View {
                 Text(selectedCategory)
                     .font(.title)
                     .bold()
+                    .foregroundColor(.primaryText)
                 
                 Spacer()
                 
@@ -1754,7 +1520,7 @@ struct UnitConverterView: View {
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
                 .padding()
-                .background(Color.gray.opacity(0.2))
+                .background(Color.cardBackground)
                 .cornerRadius(8)
             
             HStack {
@@ -1770,6 +1536,7 @@ struct UnitConverterView: View {
                 
                 Text("From: \(selectedInputUnit)")
                     .font(.headline)
+                    .foregroundColor(.primaryText)
                 
                 Spacer()
                 
@@ -1796,6 +1563,7 @@ struct UnitConverterView: View {
                 
                 Text("To: \(selectedOutputUnit)")
                     .font(.headline)
+                    .foregroundColor(.primaryText)
                 
                 Spacer()
                 
@@ -1812,10 +1580,12 @@ struct UnitConverterView: View {
             Text("Converted Value: \(convertedValue, specifier: "%.2f")")
                 .font(.title)
                 .padding()
+                .foregroundColor(.primaryText)
             
             Spacer()
         }
         .padding()
+        .background(Color.primaryBackground.edgesIgnoringSafeArea(.all))
     }
     
     func resetUnitIndexes() {
@@ -1872,14 +1642,6 @@ struct UnitConverterView: View {
         }
     }
 }
-
-struct UnitConverterView_Previews: PreviewProvider {
-    static var previews: some View {
-        UnitConverterView()
-    }
-}
-
-
 
 #Preview {
     HomeView()
