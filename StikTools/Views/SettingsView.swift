@@ -10,6 +10,7 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("username") private var username = "User"
     @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080" // default teal color
+    @AppStorage("selectedAppIcon") private var selectedAppIcon: String = "AppIcon" // default app icon
 
     @State private var selectedBackgroundColor: Color = Color.primaryBackground
 
@@ -37,7 +38,7 @@ struct SettingsView: View {
                     }
                     .listRowBackground(Color.cardBackground)
                 }
-                
+
                 Section(header: Text("Appearance").font(.headline).foregroundColor(.primaryText)) {
                     ColorPicker("Background Color", selection: $selectedBackgroundColor)
                         .onChange(of: selectedBackgroundColor) { newColor in
@@ -45,6 +46,23 @@ struct SettingsView: View {
                         }
                         .listRowBackground(Color.cardBackground)
                         .foregroundColor(.primaryText)
+                    
+                    Picker("App Icon", selection: $selectedAppIcon) {
+                        Text("Default").tag("AppIcon").foregroundColor(.white)
+                        //Text("Orange").tag("OrIcon").foregroundColor(.white)
+                        Text("Yellow").tag("YellowIcon").foregroundColor(.white)
+                        Text("Green").tag("GreenIcon").foregroundColor(.white)
+                        Text("Blue").tag("BlueIcon").foregroundColor(.white)
+                        Text("Teal").tag("TealIcon").foregroundColor(.white)
+                        Text("Black").tag("BlackIcon").foregroundColor(.white)
+                        Text("White").tag("WhiteIcon").foregroundColor(.white)
+                        // Add more icons as needed
+                    }
+                    .onChange(of: selectedAppIcon) { newIcon in
+                        changeAppIcon(to: newIcon)
+                    }
+                    .listRowBackground(Color.cardBackground)
+                    .foregroundColor(.primaryText)
                 }
 
                 Section(header: Text("About").font(.headline).foregroundColor(.primaryText)) {
@@ -65,6 +83,7 @@ struct SettingsView: View {
                             .foregroundColor(.primaryText)
                     }
                     .listRowBackground(Color.cardBackground)
+                    
                     HStack {
                         Text("Collaborators:")
                             .foregroundColor(.secondaryText)
@@ -103,5 +122,14 @@ struct SettingsView: View {
     // Save custom background color as hex string
     private func saveCustomBackgroundColor(_ color: Color) {
         customBackgroundColorHex = color.toHex() ?? "#008080"
+    }
+
+    // Change the app icon
+    private func changeAppIcon(to iconName: String) {
+        UIApplication.shared.setAlternateIconName(iconName == "AppIcon" ? nil : iconName) { error in
+            if let error = error {
+                print("Error changing app icon: \(error.localizedDescription)")
+            }
+        }
     }
 }

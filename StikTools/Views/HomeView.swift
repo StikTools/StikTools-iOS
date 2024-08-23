@@ -138,14 +138,14 @@ struct HomeView: View {
             #endif
             
             // Show privacy policy alert if not accepted
-            if !hasAcceptedPrivacyPolicy {
+            if (!hasAcceptedPrivacyPolicy) {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     showPrivacyPolicyAlert = true
                 }
             }
         }
         .onReceive(timer) { _ in
-            loadCustomBackgroundColor()
+            refreshBackground()
         }
         .alert(isPresented: $showPrivacyPolicyAlert) {
             Alert(
@@ -223,5 +223,10 @@ struct HomeView: View {
 
     private func loadCustomBackgroundColor() {
         selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
+    }
+
+    private func refreshBackground() {
+        // This function can be customized to change the background color based on time or other criteria
+        loadCustomBackgroundColor()
     }
 }
