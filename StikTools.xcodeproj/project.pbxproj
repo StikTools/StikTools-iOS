@@ -3,13 +3,34 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		681822082C756789005A0CD1 /* localnews.json in Resources */ = {isa = PBXBuildFile; fileRef = 681822072C756789005A0CD1 /* localnews.json */; };
+		68890FCB2C79286A000E3E46 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FCA2C792865000E3E46 /* SettingsView.swift */; };
+		68890FCF2C792894000E3E46 /* RNGView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FCE2C792892000E3E46 /* RNGView.swift */; };
+		68890FD12C7928AC000E3E46 /* QRCodeGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD02C7928AB000E3E46 /* QRCodeGeneratorView.swift */; };
+		68890FD52C7928FF000E3E46 /* FlashlightView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD42C7928FD000E3E46 /* FlashlightView.swift */; };
+		68890FD72C79292B000E3E46 /* LevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD62C792929000E3E46 /* LevelView.swift */; };
+		68890FD92C792941000E3E46 /* DrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD82C79293F000E3E46 /* DrawingView.swift */; };
+		68890FDB2C792954000E3E46 /* UnitConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FDA2C792952000E3E46 /* UnitConverterView.swift */; };
+		68890FDD2C79297B000E3E46 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FDC2C79297A000E3E46 /* BudgetView.swift */; };
+		68890FE22C7929F9000E3E46 /* FancyButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE12C7929F6000E3E46 /* FancyButtonStyle.swift */; };
+		68890FE42C792A0C000E3E46 /* FancyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE32C792A09000E3E46 /* FancyCard.swift */; };
+		68890FE62C792A1B000E3E46 /* AppTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE52C792A19000E3E46 /* AppTool.swift */; };
+		68890FE82C792A2A000E3E46 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE72C792A28000E3E46 /* SearchBar.swift */; };
+		68890FEA2C792A39000E3E46 /* NewsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE92C792A37000E3E46 /* NewsCard.swift */; };
+		68890FEC2C792A4E000E3E46 /* NewsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FEB2C792A4B000E3E46 /* NewsItem.swift */; };
+		68890FEE2C792A5A000E3E46 /* CounterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FED2C792A59000E3E46 /* CounterButton.swift */; };
+		68890FF02C792A67000E3E46 /* GlassBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FEF2C792A65000E3E46 /* GlassBackground.swift */; };
+		68890FF22C792A74000E3E46 /* VisualEffectBlur.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FF12C792A73000E3E46 /* VisualEffectBlur.swift */; };
+		68890FF42C792A84000E3E46 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FF32C792A82000E3E46 /* BlurView.swift */; };
+		68890FF62C792A91000E3E46 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FF52C792A90000E3E46 /* ColorExtensions.swift */; };
+		68890FF82C792A9F000E3E46 /* FontExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FF72C792A9C000E3E46 /* FontExtensions.swift */; };
+		68890FFB2C792BC5000E3E46 /* CountView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FFA2C792BBF000E3E46 /* CountView.swift */; };
 		68F7981D2C41ED3F00262CD2 /* StikToolsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7981C2C41ED3F00262CD2 /* StikToolsApp.swift */; };
-		68F7981F2C41ED3F00262CD2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7981E2C41ED3F00262CD2 /* ContentView.swift */; };
+		68F7981F2C41ED3F00262CD2 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7981E2C41ED3F00262CD2 /* HomeView.swift */; };
 		68F798212C41ED4000262CD2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F798202C41ED4000262CD2 /* Assets.xcassets */; };
 		68F798242C41ED4000262CD2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 68F798232C41ED4000262CD2 /* Preview Assets.xcassets */; };
 		68F7982E2C41ED4000262CD2 /* StikToolsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68F7982D2C41ED4000262CD2 /* StikToolsTests.swift */; };
@@ -49,11 +70,32 @@
 
 /* Begin PBXFileReference section */
 		681822072C756789005A0CD1 /* localnews.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = localnews.json; sourceTree = "<group>"; };
+		68890FCA2C792865000E3E46 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		68890FCE2C792892000E3E46 /* RNGView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNGView.swift; sourceTree = "<group>"; };
+		68890FD02C7928AB000E3E46 /* QRCodeGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCodeGeneratorView.swift; sourceTree = "<group>"; };
+		68890FD42C7928FD000E3E46 /* FlashlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlashlightView.swift; sourceTree = "<group>"; };
+		68890FD62C792929000E3E46 /* LevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelView.swift; sourceTree = "<group>"; };
+		68890FD82C79293F000E3E46 /* DrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingView.swift; sourceTree = "<group>"; };
+		68890FDA2C792952000E3E46 /* UnitConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConverterView.swift; sourceTree = "<group>"; };
+		68890FDC2C79297A000E3E46 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
+		68890FE12C7929F6000E3E46 /* FancyButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyButtonStyle.swift; sourceTree = "<group>"; };
+		68890FE32C792A09000E3E46 /* FancyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyCard.swift; sourceTree = "<group>"; };
+		68890FE52C792A19000E3E46 /* AppTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTool.swift; sourceTree = "<group>"; };
+		68890FE72C792A28000E3E46 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		68890FE92C792A37000E3E46 /* NewsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsCard.swift; sourceTree = "<group>"; };
+		68890FEB2C792A4B000E3E46 /* NewsItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsItem.swift; sourceTree = "<group>"; };
+		68890FED2C792A59000E3E46 /* CounterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterButton.swift; sourceTree = "<group>"; };
+		68890FEF2C792A65000E3E46 /* GlassBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassBackground.swift; sourceTree = "<group>"; };
+		68890FF12C792A73000E3E46 /* VisualEffectBlur.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectBlur.swift; sourceTree = "<group>"; };
+		68890FF32C792A82000E3E46 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		68890FF52C792A90000E3E46 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
+		68890FF72C792A9C000E3E46 /* FontExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontExtensions.swift; sourceTree = "<group>"; };
+		68890FFA2C792BBF000E3E46 /* CountView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountView.swift; sourceTree = "<group>"; };
 		68ECCC532C4F680A00415B1E /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		68ECCC552C4F680A00415B1E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		68F798192C41ED3F00262CD2 /* StikTools.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StikTools.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		68F7981C2C41ED3F00262CD2 /* StikToolsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StikToolsApp.swift; sourceTree = "<group>"; };
-		68F7981E2C41ED3F00262CD2 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		68F7981E2C41ED3F00262CD2 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		68F798202C41ED4000262CD2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		68F798232C41ED4000262CD2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		68F798292C41ED4000262CD2 /* StikToolsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StikToolsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,10 +105,6 @@
 		68F798392C41ED4100262CD2 /* StikToolsUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StikToolsUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		68F798462C41F9BD00262CD2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		68ECCC572C4F680A00415B1E /* DaysUntilWidget */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = DaysUntilWidget; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		68F798162C41ED3F00262CD2 /* Frameworks */ = {
@@ -93,6 +131,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		68890FC92C792703000E3E46 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				68F7981E2C41ED3F00262CD2 /* HomeView.swift */,
+				68890FFA2C792BBF000E3E46 /* CountView.swift */,
+				68890FCA2C792865000E3E46 /* SettingsView.swift */,
+				68890FCE2C792892000E3E46 /* RNGView.swift */,
+				68890FD02C7928AB000E3E46 /* QRCodeGeneratorView.swift */,
+				68890FD42C7928FD000E3E46 /* FlashlightView.swift */,
+				68890FD62C792929000E3E46 /* LevelView.swift */,
+				68890FD82C79293F000E3E46 /* DrawingView.swift */,
+				68890FDA2C792952000E3E46 /* UnitConverterView.swift */,
+				68890FDC2C79297A000E3E46 /* BudgetView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		68890FDE2C7929B3000E3E46 /* Extensions and other stuff */ = {
+			isa = PBXGroup;
+			children = (
+				68890FE12C7929F6000E3E46 /* FancyButtonStyle.swift */,
+				68890FE32C792A09000E3E46 /* FancyCard.swift */,
+				68890FE52C792A19000E3E46 /* AppTool.swift */,
+				68890FE72C792A28000E3E46 /* SearchBar.swift */,
+				68890FE92C792A37000E3E46 /* NewsCard.swift */,
+				68890FEB2C792A4B000E3E46 /* NewsItem.swift */,
+				68890FED2C792A59000E3E46 /* CounterButton.swift */,
+				68890FEF2C792A65000E3E46 /* GlassBackground.swift */,
+				68890FF12C792A73000E3E46 /* VisualEffectBlur.swift */,
+				68890FF32C792A82000E3E46 /* BlurView.swift */,
+				68890FF52C792A90000E3E46 /* ColorExtensions.swift */,
+				68890FF72C792A9C000E3E46 /* FontExtensions.swift */,
+			);
+			path = "Extensions and other stuff";
+			sourceTree = "<group>";
+		};
 		68ECCC522C4F680A00415B1E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -108,7 +182,6 @@
 				68F7981B2C41ED3F00262CD2 /* StikTools */,
 				68F7982C2C41ED4000262CD2 /* StikToolsTests */,
 				68F798362C41ED4100262CD2 /* StikToolsUITests */,
-				68ECCC572C4F680A00415B1E /* DaysUntilWidget */,
 				68ECCC522C4F680A00415B1E /* Frameworks */,
 				68F7981A2C41ED3F00262CD2 /* Products */,
 			);
@@ -130,7 +203,8 @@
 				68F798462C41F9BD00262CD2 /* Info.plist */,
 				68F7981C2C41ED3F00262CD2 /* StikToolsApp.swift */,
 				681822072C756789005A0CD1 /* localnews.json */,
-				68F7981E2C41ED3F00262CD2 /* ContentView.swift */,
+				68890FC92C792703000E3E46 /* Views */,
+				68890FDE2C7929B3000E3E46 /* Extensions and other stuff */,
 				68F798202C41ED4000262CD2 /* Assets.xcassets */,
 				68F798222C41ED4000262CD2 /* Preview Content */,
 			);
@@ -298,8 +372,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68F7981F2C41ED3F00262CD2 /* ContentView.swift in Sources */,
+				68890FD72C79292B000E3E46 /* LevelView.swift in Sources */,
+				68890FEE2C792A5A000E3E46 /* CounterButton.swift in Sources */,
+				68890FFB2C792BC5000E3E46 /* CountView.swift in Sources */,
+				68890FD52C7928FF000E3E46 /* FlashlightView.swift in Sources */,
+				68890FD12C7928AC000E3E46 /* QRCodeGeneratorView.swift in Sources */,
+				68890FF22C792A74000E3E46 /* VisualEffectBlur.swift in Sources */,
+				68890FD92C792941000E3E46 /* DrawingView.swift in Sources */,
+				68890FF82C792A9F000E3E46 /* FontExtensions.swift in Sources */,
+				68890FDB2C792954000E3E46 /* UnitConverterView.swift in Sources */,
+				68890FF02C792A67000E3E46 /* GlassBackground.swift in Sources */,
+				68890FEC2C792A4E000E3E46 /* NewsItem.swift in Sources */,
+				68890FE22C7929F9000E3E46 /* FancyButtonStyle.swift in Sources */,
+				68890FCB2C79286A000E3E46 /* SettingsView.swift in Sources */,
+				68890FE82C792A2A000E3E46 /* SearchBar.swift in Sources */,
+				68F7981F2C41ED3F00262CD2 /* HomeView.swift in Sources */,
+				68890FEA2C792A39000E3E46 /* NewsCard.swift in Sources */,
+				68890FCF2C792894000E3E46 /* RNGView.swift in Sources */,
+				68890FE42C792A0C000E3E46 /* FancyCard.swift in Sources */,
+				68890FE62C792A1B000E3E46 /* AppTool.swift in Sources */,
+				68890FF42C792A84000E3E46 /* BlurView.swift in Sources */,
 				68F7981D2C41ED3F00262CD2 /* StikToolsApp.swift in Sources */,
+				68890FDD2C79297B000E3E46 /* BudgetView.swift in Sources */,
+				68890FF62C792A91000E3E46 /* ColorExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
