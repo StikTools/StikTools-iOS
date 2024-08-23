@@ -18,8 +18,8 @@ https://discord.gg/qwcxgjg7rc
 
 ## Installation:
 ### Option 1: Join the Testflight
-1. https://testflight.apple.com/join/n7y77Avj
-
+   Join the Discord to get the TestFlight link.
+   
 ### Option 2: Build and install from the source
 1. Clone the repo:
    https://github.com/StikTools/StikTools-iOS.git
