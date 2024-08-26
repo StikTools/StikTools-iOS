@@ -29,7 +29,7 @@ struct CounterButton: View {
                 .frame(width: 80, height: 80)
                 .background(
                     Circle()
-                        .fill(LinearGradient(gradient: Gradient(colors: colors), startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .fill(.white.opacity(0.2))
                 )
                 .foregroundColor(.white)
                 .shadow(radius: 10)

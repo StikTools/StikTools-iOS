@@ -50,7 +50,7 @@ struct LevelView: View {
                 }) {
                     Text("Calibrate")
                         .padding()
-                        .background(Color.blue)
+                        .background(.white.opacity(0.2))
                         .foregroundColor(.primaryText)
                         .cornerRadius(10)
                         .shadow(radius: 10)

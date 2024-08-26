@@ -56,14 +56,14 @@ struct SettingsView: View {
                                 .foregroundColor(.primaryText)
                             Spacer()
                             Text(selectedAppIcon == "AppIcon" ? "Default" : selectedAppIcon)
-                                .foregroundColor(.secondaryText)
+                                .foregroundColor(.primaryText)
                         }
                     }
                     .popover(isPresented: $showIconPopover) {
                         VStack(spacing: 15) {
                             Text("Select App Icon")
                                 .font(.headline)
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                                 .padding(.top)
                                 .shadow(radius: 1)
 
@@ -87,7 +87,7 @@ struct SettingsView: View {
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                                     .padding()
-                                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+                                    .background(.white.opacity(0.2))
                                     .cornerRadius(10)
                                     .padding(.horizontal)
                             }
@@ -132,8 +132,24 @@ struct SettingsView: View {
                         Text("Icons by:")
                             .foregroundColor(.secondaryText)
                         Spacer()
-                        Text("Tyler")
+                        Text("Tyler & Stephen")
                             .foregroundColor(.primaryText)
+                    }
+                    .listRowBackground(Color.cardBackground)
+                    
+                    Button(action: {
+                        // Open the source code repository URL
+                        if let url = URL(string: "https://github.com/orgs/StikTools/repositories") {
+                            UIApplication.shared.open(url)
+                        }
+                    }) {
+                        HStack {
+                            Text("View Source Code")
+                                .foregroundColor(.secondaryText)
+                            Spacer()
+                            Image(systemName: "arrow.up.right.square")
+                                .foregroundColor(.primaryText)
+                        }
                     }
                     .listRowBackground(Color.cardBackground)
                 }
@@ -176,8 +192,10 @@ struct SettingsView: View {
             showIconPopover = false
         }) {
             HStack {
-                Image(systemName: icon == "AppIcon" ? "app.fill" : "circle.fill")
-                    .foregroundColor(.accentColor)
+                Image(uiImage: UIImage(named: icon) ?? UIImage())
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
                 Text(label)
                     .foregroundColor(.primaryText)
                 Spacer()

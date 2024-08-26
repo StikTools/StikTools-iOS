@@ -8,6 +8,19 @@
 import SwiftUI
 import CoreImage.CIFilterBuiltins
 
+struct CustomTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<_Label>) -> some View {
+        configuration
+            .padding(EdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10))
+            .background(Color.cardBackground)
+            .foregroundColor(.white) // Text color
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.white, lineWidth: 1)
+            )
+    }
+}
+
 struct QRCodeGeneratorView: View {
     @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @State private var qrCodeText = ""
@@ -24,30 +37,26 @@ struct QRCodeGeneratorView: View {
             
             VStack(spacing: 20) {
                 TextField("Enter text for QR code", text: $qrCodeText)
-                    .padding(.horizontal, 20)
-                    .frame(maxWidth: .infinity, maxHeight: 50)
-                    .background(Color.cardBackground)
-                    .cornerRadius(10)
+                    .textFieldStyle(CustomTextFieldStyle()) // Apply custom style
+                    .foregroundColor(.white) // Ensure text color is white
                 
                 Button(action: generateQRCode) {
                     Text("Generate QR Code")
                         .font(.bodyFont)
                         .foregroundColor(.primaryText)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.white.opacity(0.2))
                         .cornerRadius(10)
                 }
-                .buttonStyle(FancyButtonStyle())
                 
                 Button(action: exportQRCode) {
                     Text("Export QR Code")
                         .font(.bodyFont)
                         .foregroundColor(.primaryText)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.white.opacity(0.2))
                         .cornerRadius(10)
                 }
-                .buttonStyle(FancyButtonStyle())
                 .alert(isPresented: $showingAlert) {
                     Alert(
                         title: Text("QR Code Saved"),

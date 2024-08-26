@@ -13,9 +13,10 @@ struct HomeView: View {
     @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @AppStorage("hasAcceptedPrivacyPolicy") private var hasAcceptedPrivacyPolicy: Bool = false
 
-    @State private var selectedBackgroundColor: Color = Color.primaryBackground
+    @State private var selectedBackgroundColor: Color = Color(hex: UserDefaults.standard.string(forKey: "customBackgroundColor") ?? "#008080") ?? Color.primaryBackground
+
     @State private var tools: [AppTool] = [
-        AppTool(imageName: "number.circle", title: "Random Number Generator", color: Color.red.opacity(0.2), destination: AnyView(RNGView())),
+        AppTool(imageName: "number.circle", title: "RNG", color: Color.red.opacity(0.2), destination: AnyView(RNGView())),
         AppTool(imageName: "qrcode", title: "QRCode", color: Color.orange.opacity(0.2), destination: AnyView(QRCodeGeneratorView())),
         AppTool(imageName: "level", title: "Level Tool", color: Color.yellow.opacity(0.2), destination: AnyView(LevelView())),
         AppTool(imageName: "pencil.circle.fill", title: "Whiteboard", color: Color.blue.opacity(0.2), destination: AnyView(DrawingView())),
@@ -130,7 +131,6 @@ struct HomeView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear {
-            loadCustomBackgroundColor()
             #if targetEnvironment(simulator)
             loadLocalNews() // Load local news for simulator
             #else
@@ -221,12 +221,8 @@ struct HomeView: View {
         }
     }
 
-    private func loadCustomBackgroundColor() {
-        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
-    }
-
     private func refreshBackground() {
         // This function can be customized to change the background color based on time or other criteria
-        loadCustomBackgroundColor()
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
 }

@@ -24,7 +24,7 @@ struct CountView: View {
                     .foregroundColor(.primaryText)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
-                    .background(GlassBackground())
+                    .background(.white.opacity(0.2))
                     .cornerRadius(15)
                     .shadow(radius: 10)
                 
@@ -35,7 +35,7 @@ struct CountView: View {
                     )
                     .padding(.horizontal, 30)
                     .padding(.vertical, 20)
-                    .background(GlassBackground())
+                    .background(.white.opacity(0.2))
                     .cornerRadius(20)
                     .shadow(radius: 10)
                     .animation(.spring(), value: counter)
