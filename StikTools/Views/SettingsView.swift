@@ -13,6 +13,7 @@ struct SettingsView: View {
     @AppStorage("selectedAppIcon") private var selectedAppIcon: String = "AppIcon" // default app icon
 
     @State private var selectedBackgroundColor: Color = Color.primaryBackground
+    @State private var showIconPopover = false
 
     var body: some View {
         ZStack {
@@ -47,22 +48,56 @@ struct SettingsView: View {
                         .listRowBackground(Color.cardBackground)
                         .foregroundColor(.primaryText)
                     
-                    Picker("App Icon", selection: $selectedAppIcon) {
-                        Text("Default").tag("AppIcon").foregroundColor(.white)
-                        //Text("Orange").tag("OrIcon").foregroundColor(.white)
-                        Text("Yellow").tag("YellowIcon").foregroundColor(.white)
-                        Text("Green").tag("GreenIcon").foregroundColor(.white)
-                        Text("Blue").tag("BlueIcon").foregroundColor(.white)
-                        Text("Teal").tag("TealIcon").foregroundColor(.white)
-                        Text("Black").tag("BlackIcon").foregroundColor(.white)
-                        Text("White").tag("WhiteIcon").foregroundColor(.white)
-                        // Add more icons as needed
+                    Button(action: {
+                        showIconPopover.toggle()
+                    }) {
+                        HStack {
+                            Text("App Icon")
+                                .foregroundColor(.primaryText)
+                            Spacer()
+                            Text(selectedAppIcon == "AppIcon" ? "Default" : selectedAppIcon)
+                                .foregroundColor(.secondaryText)
+                        }
                     }
-                    .onChange(of: selectedAppIcon) { newIcon in
-                        changeAppIcon(to: newIcon)
+                    .popover(isPresented: $showIconPopover) {
+                        VStack(spacing: 15) {
+                            Text("Select App Icon")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .padding(.top)
+                                .shadow(radius: 1)
+
+                            Divider()
+                                .padding(.horizontal)
+
+                            iconButton("Default", icon: "AppIcon")
+                            iconButton("Yellow", icon: "YellowIcon")
+                            iconButton("Green", icon: "GreenIcon")
+                            iconButton("Blue", icon: "BlueIcon")
+                            iconButton("Teal", icon: "TealIcon")
+                            iconButton("Black", icon: "BlackIcon")
+                            iconButton("White", icon: "WhiteIcon")
+
+                            Spacer()
+
+                            Button(action: {
+                                showIconPopover = false
+                            }) {
+                                Text("Close")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .leading, endPoint: .trailing))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal)
+                            }
+                        }
+                        .padding()
+                        .background(selectedBackgroundColor)
+                        .cornerRadius(20)
+                        .shadow(radius: 5)
                     }
                     .listRowBackground(Color.cardBackground)
-                    .foregroundColor(.primaryText)
                 }
 
                 Section(header: Text("About").font(.headline).foregroundColor(.primaryText)) {
@@ -126,10 +161,31 @@ struct SettingsView: View {
 
     // Change the app icon
     private func changeAppIcon(to iconName: String) {
+        selectedAppIcon = iconName
         UIApplication.shared.setAlternateIconName(iconName == "AppIcon" ? nil : iconName) { error in
             if let error = error {
                 print("Error changing app icon: \(error.localizedDescription)")
             }
         }
+    }
+
+    // Helper function to create icon buttons
+    private func iconButton(_ label: String, icon: String) -> some View {
+        Button(action: {
+            changeAppIcon(to: icon)
+            showIconPopover = false
+        }) {
+            HStack {
+                Image(systemName: icon == "AppIcon" ? "app.fill" : "circle.fill")
+                    .foregroundColor(.accentColor)
+                Text(label)
+                    .foregroundColor(.primaryText)
+                Spacer()
+            }
+            .padding()
+            .background(Color.white.opacity(0.2))
+            .cornerRadius(10)
+        }
+        .padding(.horizontal)
     }
 }
