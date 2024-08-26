@@ -2,7 +2,7 @@ name: Nightly StikTools build
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   build:
