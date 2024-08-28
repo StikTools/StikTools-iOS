@@ -20,7 +20,7 @@ https://discord.gg/qwcxgjg7rc
 ### Option 1: Join the Testflight
    Join the Discord to get the TestFlight link.
    
-### Option 3: GitHub Releases
+### Option 2: GitHub Releases
    Check the release tab for stable builds.
 
 ### Option 3: Build and install from the source
