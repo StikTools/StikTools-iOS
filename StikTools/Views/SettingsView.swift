@@ -105,7 +105,7 @@ struct SettingsView: View {
                         Text("Version:")
                             .foregroundColor(.secondaryText)
                         Spacer()
-                        Text("1.1.0")
+                        Text("1.11")
                             .foregroundColor(.primaryText)
                     }
                     .listRowBackground(Color.cardBackground)
