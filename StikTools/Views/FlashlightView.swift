@@ -9,12 +9,14 @@ import SwiftUI
 import AVFoundation
 
 struct FlashlightView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @State private var isFlashlightOn = false
     @State private var buttonScale: CGFloat = 1.0
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
 
     var body: some View {
         ZStack {
-            Color.primaryBackground
+            selectedBackgroundColor
                 .edgesIgnoringSafeArea(.all)
             
             VStack {
@@ -55,6 +57,13 @@ struct FlashlightView: View {
                 Spacer()
             }
         }
+        .onAppear {
+            loadCustomBackgroundColor()
+        }
+    }
+
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
 
     private func toggleFlashlight() {
@@ -78,3 +87,4 @@ struct FlashlightView: View {
         generator.impactOccurred()
     }
 }
+

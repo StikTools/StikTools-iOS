@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct UnitConverterView: View {
+    @AppStorage("customBackgroundColor") private var customBackgroundColorHex: String = Color.primaryBackground.toHex() ?? "#008080"
     @State private var inputValue = ""
     @State private var selectedCategoryIndex = 0
     @State private var selectedInputUnitIndex = 0
     @State private var selectedOutputUnitIndex = 1
-    
+    @State private var selectedBackgroundColor: Color = Color.primaryBackground
+    @State private var showingBetaAlert = false
+
     let categories = ["Length", "Weight", "Temperature"]
     let units = [
         ["Meters", "Kilometers", "Feet", "Miles"],
@@ -48,21 +51,23 @@ struct UnitConverterView: View {
     }
     
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             HStack {
                 Button(action: {
                     selectedCategoryIndex = (selectedCategoryIndex - 1 + categories.count) % categories.count
                     resetUnitIndexes()
                 }) {
-                    Image(systemName: "arrow.left.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+                    Image(systemName: "arrowshape.left")
+                        .foregroundColor(.primaryText)
+                        .padding()
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(10)
                 }
                 
                 Spacer()
                 
                 Text(selectedCategory)
-                    .font(.title)
+                    .font(.titleFont)
                     .bold()
                     .foregroundColor(.primaryText)
                 
@@ -72,82 +77,67 @@ struct UnitConverterView: View {
                     selectedCategoryIndex = (selectedCategoryIndex + 1) % categories.count
                     resetUnitIndexes()
                 }) {
-                    Image(systemName: "arrow.right.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+                    Image(systemName: "arrowshape.right")
+                        .foregroundColor(.primaryText)
+                        .padding()
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(10)
                 }
             }
-            .padding()
+            .padding(.horizontal, 20)
 
             TextField("Enter value", text: $inputValue)
                 .keyboardType(.decimalPad)
-                .padding()
-                .background(Color.cardBackground)
-                .cornerRadius(8)
+                .textFieldStyle(CustomTextFieldStyle())
+                .foregroundColor(.white)
             
-            HStack {
-                Button(action: {
-                    selectedInputUnitIndex = (selectedInputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
-                }) {
-                    Image(systemName: "arrow.left.circle")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                }
+            VStack(spacing: 10) {
+                UnitSelectionView(
+                    title: "From: \(selectedInputUnit)",
+                    actionLeft: {
+                        selectedInputUnitIndex = (selectedInputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                    },
+                    actionRight: {
+                        selectedInputUnitIndex = (selectedInputUnitIndex + 1) % units[selectedCategoryIndex].count
+                    }
+                )
                 
-                Spacer()
-                
-                Text("From: \(selectedInputUnit)")
-                    .font(.headline)
-                    .foregroundColor(.primaryText)
-                
-                Spacer()
-                
-                Button(action: {
-                    selectedInputUnitIndex = (selectedInputUnitIndex + 1) % units[selectedCategoryIndex].count
-                }) {
-                    Image(systemName: "arrow.right.circle")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                }
+                UnitSelectionView(
+                    title: "To: \(selectedOutputUnit)",
+                    actionLeft: {
+                        selectedOutputUnitIndex = (selectedOutputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
+                    },
+                    actionRight: {
+                        selectedOutputUnitIndex = (selectedOutputUnitIndex + 1) % units[selectedCategoryIndex].count
+                    }
+                )
             }
-            .padding()
-            
-            HStack {
-                Button(action: {
-                    selectedOutputUnitIndex = (selectedOutputUnitIndex - 1 + units[selectedCategoryIndex].count) % units[selectedCategoryIndex].count
-                }) {
-                    Image(systemName: "arrow.left.circle")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                }
-                
-                Spacer()
-                
-                Text("To: \(selectedOutputUnit)")
-                    .font(.headline)
-                    .foregroundColor(.primaryText)
-                
-                Spacer()
-                
-                Button(action: {
-                    selectedOutputUnitIndex = (selectedOutputUnitIndex + 1) % units[selectedCategoryIndex].count
-                }) {
-                    Image(systemName: "arrow.right.circle")
-                        .resizable()
-                        .frame(width: 30, height: 30)
-                }
-            }
-            .padding()
             
             Text("Converted Value: \(convertedValue, specifier: "%.2f")")
-                .font(.title)
+                .font(.titleFont)
                 .padding()
                 .foregroundColor(.primaryText)
             
             Spacer()
         }
         .padding()
-        .background(Color.primaryBackground.edgesIgnoringSafeArea(.all))
+        .background(selectedBackgroundColor.edgesIgnoringSafeArea(.all))
+        .preferredColorScheme(.light)
+        .onAppear {
+            loadCustomBackgroundColor()
+            showingBetaAlert = true // Show the alert when the view appears
+        }
+        .alert(isPresented: $showingBetaAlert) {
+            Alert(
+                title: Text("Warning"),
+                message: Text("This tool is in beta. Use at your own risk."),
+                dismissButton: .default(Text("OK"))
+            )
+        }
+    }
+    
+    private func loadCustomBackgroundColor() {
+        selectedBackgroundColor = Color(hex: customBackgroundColorHex) ?? Color.primaryBackground
     }
     
     func resetUnitIndexes() {
@@ -202,5 +192,40 @@ struct UnitConverterView: View {
         default:
             return value
         }
+    }
+}
+
+struct UnitSelectionView: View {
+    let title: String
+    let actionLeft: () -> Void
+    let actionRight: () -> Void
+    
+    var body: some View {
+        HStack {
+            Button(action: actionLeft) {
+                Image(systemName: "arrowshape.left")
+                    .foregroundColor(.primaryText)
+                    .padding()
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(10)
+            }
+            
+            Spacer()
+            
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.primaryText)
+            
+            Spacer()
+            
+            Button(action: actionRight) {
+                Image(systemName: "arrowshape.right")
+                    .foregroundColor(.primaryText)
+                    .padding()
+                    .background(Color.white.opacity(0.2))
+                    .cornerRadius(10)
+            }
+        }
+        .padding(.horizontal, 20)
     }
 }

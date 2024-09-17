@@ -15,7 +15,6 @@
 		68890FD72C79292B000E3E46 /* LevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD62C792929000E3E46 /* LevelView.swift */; };
 		68890FD92C792941000E3E46 /* DrawingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FD82C79293F000E3E46 /* DrawingView.swift */; };
 		68890FDB2C792954000E3E46 /* UnitConverterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FDA2C792952000E3E46 /* UnitConverterView.swift */; };
-		68890FDD2C79297B000E3E46 /* BudgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FDC2C79297A000E3E46 /* BudgetView.swift */; };
 		68890FE22C7929F9000E3E46 /* FancyButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE12C7929F6000E3E46 /* FancyButtonStyle.swift */; };
 		68890FE42C792A0C000E3E46 /* FancyCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE32C792A09000E3E46 /* FancyCard.swift */; };
 		68890FE62C792A1B000E3E46 /* AppTool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68890FE52C792A19000E3E46 /* AppTool.swift */; };
@@ -77,7 +76,6 @@
 		68890FD62C792929000E3E46 /* LevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelView.swift; sourceTree = "<group>"; };
 		68890FD82C79293F000E3E46 /* DrawingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingView.swift; sourceTree = "<group>"; };
 		68890FDA2C792952000E3E46 /* UnitConverterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConverterView.swift; sourceTree = "<group>"; };
-		68890FDC2C79297A000E3E46 /* BudgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetView.swift; sourceTree = "<group>"; };
 		68890FE12C7929F6000E3E46 /* FancyButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyButtonStyle.swift; sourceTree = "<group>"; };
 		68890FE32C792A09000E3E46 /* FancyCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyCard.swift; sourceTree = "<group>"; };
 		68890FE52C792A19000E3E46 /* AppTool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTool.swift; sourceTree = "<group>"; };
@@ -143,7 +141,6 @@
 				68890FD62C792929000E3E46 /* LevelView.swift */,
 				68890FD82C79293F000E3E46 /* DrawingView.swift */,
 				68890FDA2C792952000E3E46 /* UnitConverterView.swift */,
-				68890FDC2C79297A000E3E46 /* BudgetView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -393,7 +390,6 @@
 				68890FE62C792A1B000E3E46 /* AppTool.swift in Sources */,
 				68890FF42C792A84000E3E46 /* BlurView.swift in Sources */,
 				68F7981D2C41ED3F00262CD2 /* StikToolsApp.swift in Sources */,
-				68890FDD2C79297B000E3E46 /* BudgetView.swift in Sources */,
 				68890FF62C792A91000E3E46 /* ColorExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

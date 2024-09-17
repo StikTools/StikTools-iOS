@@ -20,7 +20,9 @@ struct HomeView: View {
         AppTool(imageName: "qrcode", title: "QRCode", color: Color.orange.opacity(0.2), destination: AnyView(QRCodeGeneratorView())),
         AppTool(imageName: "level", title: "Level Tool", color: Color.yellow.opacity(0.2), destination: AnyView(LevelView())),
         AppTool(imageName: "pencil.circle.fill", title: "Whiteboard", color: Color.blue.opacity(0.2), destination: AnyView(DrawingView())),
-        AppTool(imageName: "plus.square", title: "Counter", color: Color.green.opacity(0.2), destination: AnyView(CountView()))
+        AppTool(imageName: "plus.square", title: "Counter", color: Color.green.opacity(0.2), destination: AnyView(CountView())),
+        AppTool(imageName: "ruler", title: "Unit Converter (Beta)", color: Color.green.opacity(0.2), destination: AnyView(UnitConverterView())),
+        AppTool(imageName: "flashlight.off.circle", title: "Flashlight", color: Color.green.opacity(0.2), destination: AnyView(FlashlightView())),
     ]
     @State private var searchText: String = ""
     @State private var newsItems: [NewsItem] = [] // News items will be loaded here
