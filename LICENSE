@@ -1,4 +1,4 @@
-GNU GENERAL PUBLIC LICENSE
+                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
@@ -672,3 +672,8 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+Additional permission under GNU GPL version 3 section 7
+
+The licensors of this software allow distributing this software via the Apple App Store. Source code shall be easily available under version 3 of the GNU General Public License or any later version for any distributions via this manner, including this exception.
+
