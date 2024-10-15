@@ -8,10 +8,8 @@
 - Level Tool: Use your device as a level.
 - Flashlight: Access your device's flashlight.
 - Counter: Keep track of counts.
-- Password Generator: Generate secure passwords.
 - Whiteboard: Draw and jot down ideas.
-- College Planner: Organize your academic schedule.
-- Expense Tracker: Manage your finances.
+- Unit Converter: Easily convert units.
 
 ## Join the Discord:
 https://discord.gg/qwcxgjg7rc
